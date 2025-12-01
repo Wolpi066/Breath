@@ -1,0 +1,60 @@
+@if (isOpen) {
+<div class="cart-overlay" (click)="onClose()"></div>
+}
+
+<div class="cart-drawer" [class.open]="isOpen">
+    <div class="cart-content">
+
+        <div class="cart-header">
+            <h2>CARRITO ({{ items.length }})</h2>
+        </div>
+
+        <div class="cart-items">
+            @if (items.length === 0) {
+            <div class="empty-state">
+                <p>Tu carrito está vacío</p>
+                <button (click)="onClose()">Ver más productos</button>
+            </div>
+            }
+
+            @if (items.length > 0) {
+            <div class="items-list">
+                @for (item of items; track item.id) {
+                <div class="cart-item">
+                    <div class="item-image">
+                        <img [src]="item.image" [alt]="item.name">
+                    </div>
+                    <div class="item-details">
+                        <div class="item-header">
+                            <h3>{{ item.name }}</h3>
+                            <button class="remove-btn" (click)="remove(item)">🗑</button>
+                        </div>
+                        @if (item.size) { <p class="item-size">Talle: {{ item.size }}</p> }
+                        <div class="item-footer">
+                            <div class="qty-control">
+                                <button (click)="changeQuantity(item, item.quantity - 1)">-</button>
+                                <span>{{ item.quantity }}</span>
+                                <button (click)="changeQuantity(item, item.quantity + 1)">+</button>
+                            </div>
+                            <p class="item-price">{{ item.price * item.quantity | currency:'USD':'symbol':'1.0-0' }}</p>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        @if (items.length > 0) {
+        <div class="cart-footer">
+            <div class="summary-row"><span>Subtotal</span><span>{{ subtotal | currency:'USD':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="summary-row"><span>Envío</span><span>{{ shipping === 0 ? 'GRATIS' : (shipping |
+                    currency:'USD':'symbol':'1.0-0') }}</span></div>
+            <div class="total-row"><span>TOTAL</span><span>{{ total | currency:'USD':'symbol':'1.0-0' }}</span></div>
+            <button class="checkout-btn">INICIAR COMPRA</button>
+            <button class="continue-btn" (click)="onClose()">Seguir comprando</button>
+        </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,32 @@
+/* --- VARIABLES BASE --- */
+:root {
+    --font-weight-medium: 500;
+    --font-weight-normal: 400;
+    --tracking-wider: 0.05em;
+    --tracking-widest: 0.1em;
+}
+
+/* --- BASE RESPONSIVE Y FONT STACK --- */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    /* Fuente del Sistema (Clean Sans-Serif) */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    /* Mobile Base: 14px */
+    color: black;
+}
+
+/* Base de Escritorio (≥640px) */
+@media (min-width: 640px) {
+
+    html,
+    body {
+        font-size: 16px;
+        /* Desktop Base: 16px */
+    }
+}

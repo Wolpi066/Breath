@@ -1,0 +1,73 @@
+<footer class="footer-container">
+    <div class="footer-wrapper">
+
+        <div class="footer-columns">
+
+            <div class="footer-section footer-about">
+                <h3 class="section-title">BREATHE</h3>
+                <p class="description-text">
+                    Streetwear urbano. Edición limitada. Diseño exclusivo.
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h3 class="section-title">SHOP</h3>
+                <ul class="link-list">
+                    <li>
+                        <a href="#" class="footer-link">Productos</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer-link">Nuevos Ingresos</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer-link">Sale</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3 class="section-title">INFO</h3>
+                <ul class="link-list">
+                    <li>
+                        <a href="#about" class="footer-link">Sobre Nosotros</a>
+                    </li>
+                    <li>
+                        <a href="#contacto" class="footer-link">Contacto</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer-link">Envíos</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="footer-section footer-newsletter">
+                <h3 class="section-title">NEWSLETTER</h3>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Tu email" class="newsletter-input">
+                    <button class="newsletter-button">SUSCRIBIRSE</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="bottom-content">
+                <div class="copyright-area">
+                    <p class="copyright-text">
+                        © 2025 BREATHE. Todos los derechos reservados.
+                    </p>
+                    @if (showAdminLink) {
+                    <button (click)="onAdminClick()" class="admin-link" title="Acceso administrador">
+                        ADMIN
+                    </button>
+                    }
+                </div>
+
+                <div class="social-icons">
+                    <a href="#" class="social-link">IG</a>
+                    <a href="#" class="social-link">FB</a>
+                    <a href="#" class="social-link">X</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

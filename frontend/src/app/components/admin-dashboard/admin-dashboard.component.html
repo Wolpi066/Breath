@@ -1,0 +1,251 @@
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white w-full max-w-6xl h-[90vh] overflow-y-auto rounded-xl shadow-lg p-6 relative">
+
+        <!-- Cerrar -->
+        <button class="absolute top-4 right-4 text-xl hover:opacity-60" (click)="cancelEdit(); setTab('products')">
+            ✕
+        </button>
+
+        <!-- Título -->
+        <h1 class="text-2xl tracking-wider mb-6 font-medium">ADMIN DASHBOARD</h1>
+
+        <!-- Tabs -->
+        <div class="flex gap-6 border-b pb-3 mb-6 text-sm tracking-widest">
+            <button class="pb-2" [class.border-b-2]="activeTab === 'products'"
+                [class.border-black]="activeTab === 'products'" (click)="setTab('products')">
+                PRODUCTOS
+            </button>
+
+            <button class="pb-2" [class.border-b-2]="activeTab === 'banners'"
+                [class.border-black]="activeTab === 'banners'" (click)="setTab('banners')">
+                BANNERS HOME
+            </button>
+        </div>
+
+        <!-- ============================= -->
+        <!-- TAB 1: PRODUCTOS -->
+        <!-- ============================= -->
+
+        <div *ngIf="activeTab === 'products'">
+
+            <!-- Botón nuevo producto -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="tracking-widest text-sm">LISTA DE PRODUCTOS ({{ filteredProducts.length }})</h2>
+                <button class="px-4 py-2 bg-black text-white text-xs tracking-widest hover:bg-black/80"
+                    (click)="newProduct()">
+                    NUEVO PRODUCTO
+                </button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="flex items-center gap-4 mb-6">
+                <input type="text" class="border px-3 py-2 text-sm w-64" placeholder="Buscar producto..."
+                    [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+
+                <select class="border px-3 py-2 text-sm" [(ngModel)]="categoryFilter"
+                    (change)="onCategoryChange(categoryFilter)">
+                    <option value="todos">Todos</option>
+                    <option value="buzos">Buzos</option>
+                    <option value="remeras">Remeras</option>
+                    <option value="pantalones">Pantalones</option>
+                    <option value="gorras">Gorras</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+
+            <!-- Lista de productos -->
+            <div class="space-y-6">
+
+                <div *ngFor="let product of filteredProducts"
+                    class="border p-4 rounded-lg flex gap-4 items-start bg-white">
+                    <img [src]="product.mainImage" alt="img" class="w-28 h-28 object-cover rounded-md border" />
+
+                    <div class="flex-1">
+                        <h3 class="font-medium text-sm mb-1">{{ product.name }}</h3>
+
+                        <p class="text-xs text-black/70 mb-1">
+                            Categoría: {{ getCategoryLabel(product.category) }}
+                        </p>
+
+                        <p class="text-xs text-black/70 mb-1">
+                            Precio: ${{ product.price }}
+                            <span *ngIf="product.discount" class="text-red-600 ml-2">
+                                ({{ product.discount }}% OFF)
+                            </span>
+                        </p>
+
+                        <!-- 🔵 CORREGIDO: talles-->
+                        <p class="text-xs text-black/70">
+                            Talles: {{ getSizesLabel(product) }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <button
+                            class="px-4 py-1 text-xs border border-black tracking-wider hover:bg-black hover:text-white"
+                            (click)="editProduct(product)">
+                            EDITAR
+                        </button>
+
+                        <button
+                            class="px-4 py-1 text-xs border border-red-600 text-red-600 tracking-wider hover:bg-red-600 hover:text-white"
+                            (click)="onDeleteProduct(product)">
+                            ELIMINAR
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="filteredProducts.length === 0"
+                    class="text-center py-10 text-black/50 text-sm tracking-wider">
+                    NO SE ENCONTRARON PRODUCTOS
+                </div>
+
+            </div>
+
+            <!-- ====================== -->
+            <!-- FORMULARIO DE EDICIÓN -->
+            <!-- ====================== -->
+
+            <div *ngIf="isEditing" class="mt-12 border-t pt-6">
+
+                <h2 class="text-sm tracking-widest mb-4">{{ editingProduct?.id ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}
+                </h2>
+
+                <div class="grid grid-cols-2 gap-6">
+
+                    <!-- Nombre -->
+                    <div>
+                        <label class="text-xs tracking-widest">NOMBRE</label>
+                        <input type="text" class="border w-full px-3 py-2 text-sm" [(ngModel)]="editingProduct!.name" />
+                    </div>
+
+                    <!-- Categoría -->
+                    <div>
+                        <label class="text-xs tracking-widest">CATEGORÍA</label>
+                        <select class="border w-full px-3 py-2 text-sm" [(ngModel)]="editingProduct!.category">
+                            <option value="buzos">Buzos</option>
+                            <option value="remeras">Remeras</option>
+                            <option value="pantalones">Pantalones</option>
+                            <option value="gorras">Gorras</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- Precio -->
+                    <div>
+                        <label class="text-xs tracking-widest">PRECIO</label>
+                        <input type="number" class="border w-full px-3 py-2 text-sm"
+                            [(ngModel)]="editingProduct!.price" />
+                    </div>
+
+                    <!-- Descuento -->
+                    <div>
+                        <label class="text-xs tracking-widest">DESCUENTO (%)</label>
+                        <input type="number" class="border w-full px-3 py-2 text-sm"
+                            [(ngModel)]="editingProduct!.discount" />
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="col-span-2">
+                        <label class="text-xs tracking-widest">DESCRIPCIÓN</label>
+                        <textarea class="border w-full px-3 py-2 text-sm" rows="3"
+                            [(ngModel)]="editingProduct!.description"></textarea>
+                    </div>
+
+                    <!-- Talles -->
+                    <div class="col-span-2">
+                        <h3 class="text-xs tracking-widest mb-2">TALLES Y STOCK</h3>
+
+                        <div class="grid grid-cols-4 gap-4">
+                            <div *ngFor="let s of editingProduct!.sizes; let i = index">
+                                <label class="text-xs">{{ s.size }}</label>
+                                <input type="number" class="border w-full px-3 py-1 text-sm mt-1"
+                                    [(ngModel)]="editingProduct!.sizes[i].stock" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Imagen principal -->
+                    <div class="col-span-2">
+                        <label class="text-xs tracking-widest">IMAGEN PRINCIPAL (URL)</label>
+                        <input type="text" class="border w-full px-3 py-2 text-sm"
+                            [(ngModel)]="editingProduct!.mainImage" />
+                    </div>
+
+                </div>
+
+                <!-- Botones -->
+                <div class="mt-6 flex gap-4">
+                    <button class="px-6 py-2 bg-black text-white tracking-widest text-xs" (click)="onSaveProduct()">
+                        GUARDAR
+                    </button>
+
+                    <button class="px-6 py-2 border tracking-widest text-xs hover:bg-black hover:text-white"
+                        (click)="cancelEdit()">
+                        CANCELAR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- TAB 2: BANNERS -->
+        <!-- ============================= -->
+
+        <div *ngIf="activeTab === 'banners'">
+
+            <h2 class="text-sm tracking-widest mb-6">BANNERS PARA LA HOME</h2>
+
+            <!-- BANNER 1 -->
+            <div class="mb-10">
+                <h3 class="text-xs tracking-widest mb-2">BANNER 1</h3>
+
+                <div *ngIf="banner1Preview; else uploadBanner1" class="space-y-2">
+                    <img [src]="banner1Preview" class="w-full max-h-64 object-cover rounded-md" />
+                    <button
+                        class="px-4 py-1 text-xs border border-red-600 text-red-600 tracking-widest hover:bg-red-600 hover:text-white"
+                        (click)="clearBanner('banner1')">
+                        BORRAR
+                    </button>
+                </div>
+
+                <ng-template #uploadBanner1>
+                    <label class="block border p-6 text-center cursor-pointer bg-gray-50">
+                        <span class="text-xs tracking-widest">SUBIR IMAGEN</span>
+                        <input type="file" class="hidden" accept="image/*"
+                            (change)="handleBannerUpload($event, 'banner1')" />
+                    </label>
+                </ng-template>
+            </div>
+
+            <!-- BANNER 2 -->
+            <div class="mb-10">
+                <h3 class="text-xs tracking-widest mb-2">BANNER 2</h3>
+
+                <div *ngIf="banner2Preview; else uploadBanner2" class="space-y-2">
+                    <img [src]="banner2Preview" class="w-full max-h-64 object-cover rounded-md" />
+                    <button
+                        class="px-4 py-1 text-xs border border-red-600 text-red-600 tracking-widest hover:bg-red-600 hover:text-white"
+                        (click)="clearBanner('banner2')">
+                        BORRAR
+                    </button>
+                </div>
+
+                <ng-template #uploadBanner2>
+                    <label class="block border p-6 text-center cursor-pointer bg-gray-50">
+                        <span class="text-xs tracking-widest">SUBIR IMAGEN</span>
+                        <input type="file" class="hidden" accept="image/*"
+                            (change)="handleBannerUpload($event, 'banner2')" />
+                    </label>
+                </ng-template>
+            </div>
+
+            <!-- Guardar banners -->
+            <button class="px-6 py-2 bg-black text-white tracking-widest text-xs" (click)="onSaveBanners()">
+                GUARDAR BANNERS
+            </button>
+
+        </div>
+
+    </div>
+</div>

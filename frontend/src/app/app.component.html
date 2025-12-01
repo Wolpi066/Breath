@@ -1,0 +1,38 @@
+<div class="min-h-screen bg-black">
+
+    @if (!isCartOpen()) {
+    <app-minimal-navbar [cartItemsCount]="cartItemsCount()" (cartClick)="openCart()" (navigate)="navigate($event)">
+    </app-minimal-navbar>
+    }
+
+    @if (currentPage() === 'home') {
+    <app-hero></app-hero>
+    }
+
+
+
+    @if (currentPage() === 'home') {
+    <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()" (addToCart)="addToCart($event)">
+    </app-minimal-product-grid>
+
+    } @else {
+    <app-products-page [adminProducts]="adminProducts()" (addToCart)="addToCart($event)">
+    </app-products-page>
+    }
+
+
+    @if (!isCartOpen()) {
+    <app-minimal-footer (adminClick)="isAdminOpen.set(true)"></app-minimal-footer>
+    }
+
+    <app-shopping-cart [isOpen]="isCartOpen()" [items]="cart()" (close)="closeCart()"
+        (updateQuantity)="updateQuantity($event)" (removeItem)="removeItem($event)">
+    </app-shopping-cart>
+
+    @if (isAdminOpen()) {
+    <app-admin-dashboard [products]="adminProducts()" [banners]="banners()" (close)="isAdminOpen.set(false)"
+        (saveProduct)="saveProduct($event)" (deleteProduct)="deleteProduct($event)" (saveBanners)="saveBanners($event)">
+    </app-admin-dashboard>
+    }
+
+</div>

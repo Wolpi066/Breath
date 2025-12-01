@@ -1,0 +1,39 @@
+.products-section {
+    padding: 80px 0;
+    background-color: white;
+    width: 100%;
+    overflow: hidden;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 4px;
+    margin-bottom: 60px;
+    text-transform: uppercase;
+}
+
+/* GRID RESPONSIVO PURO */
+.grid-container {
+    display: grid;
+    width: 100%;
+    padding: 0 16px;
+    /* Padding lateral */
+    box-sizing: border-box;
+
+    /* Por defecto (Mobile): 2 columnas */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 12px;
+    /* Vertical 48px, Horizontal 12px */
+    margin-bottom: 64px;
+}
+
+/* DESKTOP (Mayores a 1024px) */
+@media (min-width: 1024px) {
+    .grid-container {
+        /* 4 columnas */
+        grid-template-columns: repeat(4, 1fr);
+        gap: 64px 16px;
+        /* Vertical 64px, Horizontal 16px */
+    }
+}

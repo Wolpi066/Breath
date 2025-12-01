@@ -1,0 +1,63 @@
+<nav class="navbar" [class.navbar-solid]="isSolidBg" [class.dark-content]="isDarkContent" (mouseenter)="onMouseEnter()"
+    (mouseleave)="onMouseLeave()">
+
+    <div class="nav-container">
+
+        <div class="nav-left">
+            <button class="nav-btn menu-btn" (click)="toggleMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="nav-center-absolute">
+            <button class="logo-btn" (click)="navigateTo('home')">
+                <img src="assets/breathe/logoBreatheBlanco.png" alt="Breathe" class="logo-img" />
+            </button>
+        </div>
+
+        <div class="nav-right">
+
+            @if (isSearchOpen) {
+            <div class="search-box-inline">
+                <input type="text" [(ngModel)]="searchQuery" placeholder="BUSCAR PRODUCTOS..." autoFocus>
+                <button class="close-search-btn" (click)="toggleSearch()">✕</button>
+            </div>
+            } @else {
+            <button class="nav-btn" (click)="toggleSearch()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+            }
+
+            <button class="nav-btn relative" (click)="openCart()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                @if (cartItemsCount > 0) {
+                <span class="cart-badge">{{ cartItemsCount }}</span>
+                }
+            </button>
+        </div>
+
+    </div>
+
+    @if (isMenuOpen) {
+    <div class="menu-dropdown" (mouseleave)="toggleMenu()">
+        <div class="menu-links">
+            <button (click)="navigateTo('home')">INICIO</button>
+            <button (click)="navigateTo('productos')">PRODUCTOS</button>
+            <button (click)="navigateTo('contacto')">CONTACTO</button>
+            <button (click)="navigateTo('about')">ABOUT US</button>
+        </div>
+    </div>
+    }
+
+</nav>

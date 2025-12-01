@@ -1,0 +1,12 @@
+/* src/app/components/admin-dashboard/admin-dashboard.component.css */
+
+/* Por ahora todo el layout está con clases utilitarias.
+   Si querés, podés ajustar scroll interno o fondos acá. */
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

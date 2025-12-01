@@ -1,0 +1,27 @@
+<div class="card-container" (click)="onAddToCartClick($event)">
+
+    <div class="image-wrapper">
+        <img [src]="currentImage" (error)="handleImageError()" [alt]="name">
+
+        @if (salePercentage) {
+        <div class="sale-badge">SALE</div>
+        }
+    </div>
+
+    <div class="info-wrapper">
+        <h3 class="product-name">{{ name }}</h3>
+
+        <div class="price-row">
+            @if (originalPrice) {
+            <span class="price-original">{{ originalPrice | currency:'USD':'symbol':'1.0-0' }}</span>
+            }
+            <span class="price-current">{{ price | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+
+        <p class="installments">
+            {{ installments }} cuotas sin interés
+        </p>
+
+        <button class="buy-btn">COMPRAR</button>
+    </div>
+</div>

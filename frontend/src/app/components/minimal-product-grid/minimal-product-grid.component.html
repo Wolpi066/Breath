@@ -1,0 +1,13 @@
+<section class="products-section">
+    <div class="section-title">OFERTAS DESTACADAS</div>
+
+    <div class="grid-container">
+        @for (product of firstRowProducts; track product.id) {
+        <app-minimal-product-card [id]="product.id" [name]="product.name" [price]="product.price"
+            [originalPrice]="product.originalPrice" [image]="product.mainImage" [salePercentage]="product.discount"
+            (addToCart)="onCardClick($event)">
+        </app-minimal-product-card>
+        }
+    </div>
+
+</section>

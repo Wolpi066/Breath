@@ -1,0 +1,180 @@
+/* --- 1. CONTENEDOR PRINCIPAL --- */
+.footer-container {
+    background-color: black;
+    color: white;
+    padding: 64px 0 32px;
+    /* py-16 y pb-8 */
+    font-size: 14px;
+}
+
+.footer-wrapper {
+    max-width: 1280px;
+    /* max-w-7xl */
+    margin: 0 auto;
+    padding: 0 16px;
+    /* px-4 sm:px-6 */
+}
+
+/* --- 2. GRID DE COLUMNAS --- */
+.footer-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Mobile: 1 columna */
+    gap: 32px;
+    /* gap-8 */
+    margin-bottom: 48px;
+    /* mb-12 */
+}
+
+@media (min-width: 768px) {
+    .footer-columns {
+        grid-template-columns: repeat(4, 1fr);
+        /* Desktop: 4 columnas */
+        gap: 32px;
+    }
+}
+
+/* --- 3. SECCIONES Y TIPOGRAFÍA --- */
+.footer-section h3.section-title {
+    letter-spacing: 2px;
+    /* tracking-widest */
+    margin-bottom: 16px;
+    font-size: 14px;
+    /* text-sm */
+}
+
+
+.description-text {
+    font-size: 14px;
+    /* text-sm */
+    color: rgba(255, 255, 255, 0.6);
+    /* text-white/60 */
+    line-height: 1.6;
+}
+
+.link-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* space-y-2 */
+}
+
+.footer-link {
+    color: rgba(255, 255, 255, 0.6);
+    /* text-white/60 */
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: white;
+}
+
+/* --- 4. NEWSLETTER Y FORM --- */
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* space-y-3 */
+}
+
+.newsletter-input {
+    width: 100%;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: transparent;
+    color: white;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border-color: white;
+}
+
+.newsletter-button {
+    width: 100%;
+    background-color: white;
+    color: black;
+    padding: 8px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    /* tracking-widest */
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.newsletter-button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* --- 5. SECCIÓN INFERIOR --- */
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 32px;
+}
+
+.bottom-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .bottom-content {
+        flex-direction: row;
+    }
+}
+
+.copyright-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.copyright-text {
+    font-size: 12px;
+    /* text-xs */
+    color: rgba(255, 255, 255, 0.4);
+    /* text-white/40 */
+    margin: 0;
+}
+
+.admin-link {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.2);
+    /* text-white/20 */
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.admin-link:hover {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.social-icons {
+    display: flex;
+    gap: 16px;
+}
+
+.social-link {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.social-link:hover {
+    color: white;
+}
