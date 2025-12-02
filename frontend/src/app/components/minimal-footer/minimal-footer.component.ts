@@ -9,11 +9,10 @@ import { CommonModule } from '@angular/common';
     styleUrls: ['./minimal-footer.component.css']
 })
 export class MinimalFooterComponent {
-    // Opcional: Input para controlar si se muestra el link de Admin
-    @Input() showAdminLink: boolean = false;
+    // Ya no usamos el Input showAdminLink porque lo hicimos siempre visible
     @Output() adminClick = new EventEmitter<void>();
 
     onAdminClick() {
         this.adminClick.emit();
     }
-}
+} 

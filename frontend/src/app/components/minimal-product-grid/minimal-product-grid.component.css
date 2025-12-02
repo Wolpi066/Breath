@@ -1,39 +1,78 @@
-.products-section {
-    padding: 80px 0;
-    background-color: white;
+/* --- SECCIÓN GENERAL --- */
+.grid-section {
     width: 100%;
+    background-color: white;
+    padding-top: 80px;
+    /* Separación del Hero */
+    padding-bottom: 80px;
     overflow: hidden;
 }
 
+/* --- TÍTULO --- */
 .section-title {
     text-align: center;
-    font-size: 12px;
-    letter-spacing: 4px;
-    margin-bottom: 60px;
-    text-transform: uppercase;
-}
-
-/* GRID RESPONSIVO PURO */
-.grid-container {
-    display: grid;
-    width: 100%;
-    padding: 0 16px;
-    /* Padding lateral */
-    box-sizing: border-box;
-
-    /* Por defecto (Mobile): 2 columnas */
-    grid-template-columns: repeat(2, 1fr);
-    gap: 48px 12px;
-    /* Vertical 48px, Horizontal 12px */
     margin-bottom: 64px;
 }
 
-/* DESKTOP (Mayores a 1024px) */
+.section-title h2 {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: black;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* --- CONTENEDOR ANCHO (Full Bleed) --- */
+.grid-wrapper {
+    width: 100%;
+    padding: 0;
+    /* Sin márgenes laterales (Toca los bordes) */
+    box-sizing: border-box;
+}
+
+/* --- GRILLA DE PRODUCTOS (Gaps Restaurados) --- */
+.product-grid {
+    display: grid;
+    width: 100%;
+
+    /* Mobile: 2 Columnas */
+    grid-template-columns: repeat(2, 1fr);
+
+    /* 👇 GAPS RESTAURADOS A LA FICHA TÉCNICA ORIGINAL:
+     Vertical: 48px
+     Horizontal: 12px (Antes lo achiqué a 4px, ahora vuelve a 12px)
+  */
+    gap: 48px 12px;
+
+    margin-bottom: 64px;
+    /* Espacio antes del siguiente banner */
+}
+
+/* Desktop: 4 Columnas */
 @media (min-width: 1024px) {
-    .grid-container {
-        /* 4 columnas */
+    .product-grid {
         grid-template-columns: repeat(4, 1fr);
+
+        /* 👇 GAPS RESTAURADOS A LA FICHA TÉCNICA ORIGINAL:
+       Vertical: 64px
+       Horizontal: 16px (Antes 4px, ahora vuelve a 16px)
+    */
         gap: 64px 16px;
-        /* Vertical 64px, Horizontal 16px */
     }
+}
+
+/* --- BANNERS --- */
+.banner-container {
+    width: 100%;
+    margin-bottom: 64px;
+    /* Separación después del banner */
+    overflow: hidden;
+}
+
+.banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }

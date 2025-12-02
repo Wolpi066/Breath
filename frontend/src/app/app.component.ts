@@ -11,7 +11,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { Product } from './models/product.model';
 import { BannerData } from './models/banner.model';
 
-// --- RUTAS DE IMÁGENES ---
+// --- RUTAS DE IMÁGENES (Asegúrate que coincidan con tus archivos) ---
 const buzoBreathe = 'assets/CARDS/NEWstfu.png';
 const buzoBreatheAstronaut = 'assets/CARDS/NEWapollo.png';
 const buzoHopeless = 'assets/CARDS/NEWhopeless.png';
@@ -26,74 +26,19 @@ const gorraBlack = 'assets/CARDS/NEWgorraNegra.png';
 const banner1Img = 'assets/CARDS/calleNoche.jpg';
 const banner2Img = 'assets/CARDS/wmremove-transformed.png';
 
-// --- LISTA MAESTRA DE PRODUCTOS (11 ITEMS ÚNICOS) ---
+// --- LISTA MAESTRA DE PRODUCTOS ---
 const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: '1', name: 'HOODIE BREATHE MASK', description: 'Buzo con capucha diseño máscara', category: 'buzos',
-    price: 85, discount: 0,
-    sizes: [{ size: 'S', stock: 7 }, { size: 'M', stock: 11 }, { size: 'L', stock: 9 }, { size: 'XL', stock: 5 }],
-    mainImage: buzoBreathe, hoverImage: buzoBreathe
-  },
-  {
-    id: '2', name: 'HOODIE BREATHE ASTRONAUT', description: 'Buzo con capucha astronauta', category: 'buzos',
-    price: 90, discount: 0,
-    sizes: [{ size: 'S', stock: 6 }, { size: 'M', stock: 10 }, { size: 'L', stock: 8 }, { size: 'XL', stock: 4 }],
-    mainImage: buzoBreatheAstronaut, hoverImage: buzoBreatheAstronaut
-  },
-  {
-    id: '3', name: 'HOODIE HOPELESS STATUE', description: 'Buzo clásica', category: 'buzos',
-    price: 95, discount: 20,
-    sizes: [{ size: 'S', stock: 6 }, { size: 'M', stock: 10 }, { size: 'L', stock: 8 }, { size: 'XL', stock: 5 }],
-    mainImage: buzoHopeless, hoverImage: buzoHopeless
-  },
-  {
-    id: '4', name: 'T-SHIRT PARADISE', description: 'Remera blanca tropical', category: 'remeras',
-    price: 40, discount: 0,
-    sizes: [{ size: 'S', stock: 10 }, { size: 'M', stock: 15 }, { size: 'L', stock: 12 }, { size: 'XL', stock: 8 }],
-    mainImage: remeraParadise, hoverImage: remeraParadise
-  },
-  {
-    id: '5', name: 'HOODIE ROSWELL RECORD', description: 'Buzo Roswell', category: 'buzos',
-    price: 90, discount: 15,
-    sizes: [{ size: 'S', stock: 6 }, { size: 'M', stock: 10 }, { size: 'L', stock: 8 }, { size: 'XL', stock: 4 }],
-    mainImage: buzoRoswell, hoverImage: buzoRoswell
-  },
-  {
-    id: '6', name: 'HOODIE TRAGEDY', description: 'Buzo Tragedy', category: 'buzos',
-    price: 85, discount: 0,
-    sizes: [{ size: 'S', stock: 8 }, { size: 'M', stock: 12 }, { size: 'L', stock: 10 }, { size: 'XL', stock: 6 }],
-    mainImage: buzoTragedy, hoverImage: buzoTragedy
-  },
-  {
-    id: '7', name: 'T-SHIRT WHO SHOT CUPID WHITE', description: 'Remera blanca cupido', category: 'remeras',
-    price: 42, discount: 10,
-    sizes: [{ size: 'S', stock: 12 }, { size: 'M', stock: 18 }, { size: 'L', stock: 14 }, { size: 'XL', stock: 10 }],
-    mainImage: remeraCupidWhite, hoverImage: remeraCupidWhite
-  },
-  {
-    id: '8', name: 'T-SHIRT LAST HIT', description: 'Remera negra last hit', category: 'remeras',
-    price: 45, discount: 0,
-    sizes: [{ size: 'S', stock: 10 }, { size: 'M', stock: 16 }, { size: 'L', stock: 12 }, { size: 'XL', stock: 8 }],
-    mainImage: remeraLastHit, hoverImage: remeraLastHit
-  },
-  {
-    id: '9', name: 'T-SHIRT WHO SHOT CUPID BLACK', description: 'Remera negra cupido', category: 'remeras',
-    price: 42, discount: 0,
-    sizes: [{ size: 'S', stock: 14 }, { size: 'M', stock: 20 }, { size: 'L', stock: 16 }, { size: 'XL', stock: 12 }],
-    mainImage: remeraCupidBlack, hoverImage: remeraCupidBlack
-  },
-  {
-    id: '10', name: 'CAP BREATHE WHITE', description: 'Gorra blanca', category: 'gorras',
-    price: 30, discount: 0,
-    sizes: [{ size: 'Única', stock: 25 }],
-    mainImage: gorraWhite, hoverImage: gorraWhite
-  },
-  {
-    id: '11', name: 'CAP BREATHE BLACK', description: 'Gorra negra', category: 'gorras',
-    price: 30, discount: 0,
-    sizes: [{ size: 'Única', stock: 30 }],
-    mainImage: gorraBlack, hoverImage: gorraBlack
-  },
+  { id: '1', name: 'HOODIE BREATHE MASK', description: 'Buzo con capucha diseño máscara', category: 'buzos', price: 85, discount: 0, sizes: [{ size: 'S', stock: 7 }], mainImage: buzoBreathe, hoverImage: buzoBreathe },
+  { id: '2', name: 'HOODIE BREATHE ASTRONAUT', description: 'Buzo con capucha astronauta', category: 'buzos', price: 90, discount: 0, sizes: [{ size: 'M', stock: 10 }], mainImage: buzoBreatheAstronaut, hoverImage: buzoBreatheAstronaut },
+  { id: '3', name: 'HOODIE HOPELESS STATUE', description: 'Buzo clásica', category: 'buzos', price: 95, discount: 20, sizes: [{ size: 'L', stock: 8 }], mainImage: buzoHopeless, hoverImage: buzoHopeless },
+  { id: '4', name: 'T-SHIRT PARADISE', description: 'Remera blanca tropical', category: 'remeras', price: 40, discount: 0, sizes: [{ size: 'M', stock: 15 }], mainImage: remeraParadise, hoverImage: remeraParadise },
+  { id: '5', name: 'HOODIE ROSWELL RECORD', description: 'Buzo Roswell', category: 'buzos', price: 90, discount: 15, sizes: [{ size: 'L', stock: 8 }], mainImage: buzoRoswell, hoverImage: buzoRoswell },
+  { id: '6', name: 'HOODIE TRAGEDY', description: 'Buzo Tragedy', category: 'buzos', price: 85, discount: 0, sizes: [{ size: 'M', stock: 12 }], mainImage: buzoTragedy, hoverImage: buzoTragedy },
+  { id: '7', name: 'T-SHIRT WHO SHOT CUPID WHITE', description: 'Remera blanca cupido', category: 'remeras', price: 42, discount: 10, sizes: [{ size: 'M', stock: 18 }], mainImage: remeraCupidWhite, hoverImage: remeraCupidWhite },
+  { id: '8', name: 'T-SHIRT LAST HIT', description: 'Remera negra last hit', category: 'remeras', price: 45, discount: 0, sizes: [{ size: 'L', stock: 12 }], mainImage: remeraLastHit, hoverImage: remeraLastHit },
+  { id: '9', name: 'T-SHIRT WHO SHOT CUPID BLACK', description: 'Remera negra cupido', category: 'remeras', price: 42, discount: 0, sizes: [{ size: 'M', stock: 20 }], mainImage: remeraCupidBlack, hoverImage: remeraCupidBlack },
+  { id: '10', name: 'CAP BREATHE WHITE', description: 'Gorra blanca', category: 'gorras', price: 30, discount: 0, sizes: [{ size: 'Única', stock: 25 }], mainImage: gorraWhite, hoverImage: gorraWhite },
+  { id: '11', name: 'CAP BREATHE BLACK', description: 'Gorra negra', category: 'gorras', price: 30, discount: 0, sizes: [{ size: 'Única', stock: 30 }], mainImage: gorraBlack, hoverImage: gorraBlack },
 ];
 
 @Component({
@@ -114,8 +59,8 @@ const INITIAL_PRODUCTS: Product[] = [
 })
 export class AppComponent {
 
-  // --- ESTADO ---
-  currentPage = signal<'home' | 'productos' | 'contacto' | 'about'>('home');
+  // --- ESTADO Y TIPOS EXPANDIDOS ---
+  currentPage = signal<'home' | 'productos' | 'contacto' | 'about' | 'admin'>('home');
   cart = signal<{ id: string; name: string; price: number; quantity: number; image: string; size?: string }[]>([]);
   isCartOpen = signal(false);
   isAdminOpen = signal(false);
@@ -126,7 +71,6 @@ export class AppComponent {
 
   // --- INICIALIZACIÓN ---
   constructor() {
-    // Carga de productos (usando la lista INITIAL_PRODUCTS completa)
     if (INITIAL_PRODUCTS.length > 0) {
       this.adminProducts.set(INITIAL_PRODUCTS);
       localStorage.setItem('breath-products', JSON.stringify(INITIAL_PRODUCTS));
@@ -136,7 +80,6 @@ export class AppComponent {
       else this.adminProducts.set([]);
     }
 
-    // Carga de Banners
     const savedBanners = localStorage.getItem('breath-banners');
     if (savedBanners) this.banners.set(JSON.parse(savedBanners));
   }
@@ -151,7 +94,7 @@ export class AppComponent {
   }
 
   // --- NAVEGACIÓN ---
-  navigate(page: 'home' | 'productos' | 'contacto' | 'about') { // 👈 TIPOS EXPANDIDOS
+  navigate(page: 'home' | 'productos' | 'contacto' | 'about' | 'admin') {
     this.currentPage.set(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -159,7 +102,7 @@ export class AppComponent {
   openCart() { this.isCartOpen.set(true); }
   closeCart() { this.isCartOpen.set(false); }
 
-  // --- LÓGICA CARRITO ---
+  // --- LÓGICA CARRITO SILENCIOSA ---
   addToCart(productId: string) {
     const product = this.adminProducts().find((p) => p.id === productId);
     if (!product) return;
@@ -168,17 +111,9 @@ export class AppComponent {
     if (existing) {
       this.cart.update((prev) => prev.map((i) => i.id === productId ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      this.cart.update((prev) => [...prev, {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        image: product.mainImage,
-        size: 'Única'
-      }]);
+      this.cart.update((prev) => [...prev, { id: product.id, name: product.name, price: product.price, quantity: 1, image: product.mainImage, size: 'Única' }]);
     }
-    // "Silencioso": No abrimos el carrito
-    console.log('Producto agregado');
+    console.log('Producto agregado (Silencioso)');
   }
 
   updateQuantity(event: { id: string; quantity: number }) {
@@ -190,7 +125,7 @@ export class AppComponent {
     this.cart.update((prev) => prev.filter((i) => i.id !== id));
   }
 
-  // --- LÓGICA ADMIN ---
+  // --- LÓGICA ADMIN (CRUD) ---
   saveProduct(product: Product) {
     const exists = this.adminProducts().some((p) => p.id === product.id);
     let newList = exists ? this.adminProducts().map((p) => p.id === product.id ? product : p) : [...this.adminProducts(), product];

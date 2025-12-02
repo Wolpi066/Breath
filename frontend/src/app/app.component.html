@@ -9,30 +9,38 @@
     <app-hero></app-hero>
     }
 
+    <main class="bg-white">
 
+        @if (currentPage() === 'home') {
+        <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()"
+            (addToCart)="addToCart($event)">
+        </app-minimal-product-grid>
 
-    @if (currentPage() === 'home') {
-    <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()" (addToCart)="addToCart($event)">
-    </app-minimal-product-grid>
+        } @else if (currentPage() === 'productos') {
+        <app-products-page [adminProducts]="adminProducts()" (addToCart)="addToCart($event)">
+        </app-products-page>
 
-    } @else {
-    <app-products-page [adminProducts]="adminProducts()" (addToCart)="addToCart($event)">
-    </app-products-page>
-    }
+        } @else if (currentPage() === 'admin') {
+        <app-admin-dashboard [products]="adminProducts()" [banners]="banners()" (close)="navigate('home')"
+            (saveProduct)="saveProduct($event)" (deleteProduct)="deleteProduct($event)"
+            (saveBanners)="saveBanners($event)">
+        </app-admin-dashboard>
 
+        } @else {
+        <div style="padding-top: 150px; text-align: center;">
+            <h1>PÁGINA EN CONSTRUCCIÓN</h1>
+            <p>Sección: {{ currentPage() | uppercase }}</p>
+            <button (click)="navigate('home')">VOLVER AL INICIO</button>
+        </div>
+        }
+    </main>
 
-    @if (!isCartOpen()) {
-    <app-minimal-footer (adminClick)="isAdminOpen.set(true)"></app-minimal-footer>
+    @if (!isCartOpen() && currentPage() !== 'admin') {
+    <app-minimal-footer (adminClick)="navigate('admin')"></app-minimal-footer>
     }
 
     <app-shopping-cart [isOpen]="isCartOpen()" [items]="cart()" (close)="closeCart()"
         (updateQuantity)="updateQuantity($event)" (removeItem)="removeItem($event)">
     </app-shopping-cart>
-
-    @if (isAdminOpen()) {
-    <app-admin-dashboard [products]="adminProducts()" [banners]="banners()" (close)="isAdminOpen.set(false)"
-        (saveProduct)="saveProduct($event)" (deleteProduct)="deleteProduct($event)" (saveBanners)="saveBanners($event)">
-    </app-admin-dashboard>
-    }
 
 </div>
