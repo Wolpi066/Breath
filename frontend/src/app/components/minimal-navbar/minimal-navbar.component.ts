@@ -11,7 +11,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class MinimalNavbarComponent {
     @Input() cartItemsCount = 0;
+    @Input() isLoggedIn = false; // NUEVO: Para mostrar el puntito
+
     @Output() cartClick = new EventEmitter<void>();
+    @Output() authClick = new EventEmitter<void>(); // NUEVO: Click en icono user
     @Output() navigate = new EventEmitter<'home' | 'productos' | 'contacto' | 'about'>();
 
     isMenuOpen = false;
@@ -34,7 +37,6 @@ export class MinimalNavbarComponent {
         this.isPastHero = window.scrollY > (window.innerHeight - 50);
     }
 
-    // 👇 ESTAS SON LAS FUNCIONES QUE FALTABAN Y DABA ERROR
     onMouseEnter() { this.isHovered = true; }
     onMouseLeave() { this.isHovered = false; }
 

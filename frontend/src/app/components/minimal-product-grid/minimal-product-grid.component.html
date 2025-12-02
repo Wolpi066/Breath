@@ -10,7 +10,7 @@
             @for (product of firstRowProducts; track product.id) {
             <app-minimal-product-card [id]="product.id" [name]="product.name" [price]="product.price"
                 [originalPrice]="product.originalPrice" [image]="product.mainImage" [salePercentage]="product.discount"
-                (addToCart)="onCardClick($event)"></app-minimal-product-card>
+                (addToCart)="onAddToCartClick($event)" (cardClick)="onCardClick($event)"></app-minimal-product-card>
             }
         </div>
 
@@ -24,7 +24,7 @@
             @for (product of secondRowProducts; track product.id) {
             <app-minimal-product-card [id]="product.id" [name]="product.name" [price]="product.price"
                 [originalPrice]="product.originalPrice" [image]="product.mainImage" [salePercentage]="product.discount"
-                (addToCart)="onCardClick($event)"></app-minimal-product-card>
+                (addToCart)="onAddToCartClick($event)" (cardClick)="onCardClick($event)"></app-minimal-product-card>
             }
         </div>
 
@@ -39,7 +39,7 @@
             @for (product of remainingProducts; track product.id) {
             <app-minimal-product-card [id]="product.id" [name]="product.name" [price]="product.price"
                 [originalPrice]="product.originalPrice" [image]="product.mainImage" [salePercentage]="product.discount"
-                (addToCart)="onCardClick($event)"></app-minimal-product-card>
+                (addToCart)="onAddToCartClick($event)" (cardClick)="onCardClick($event)"></app-minimal-product-card>
             }
         </div>
         }

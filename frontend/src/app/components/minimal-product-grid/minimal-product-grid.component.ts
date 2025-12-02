@@ -12,31 +12,36 @@ import { BannerData } from '../../models/banner.model';
     styleUrls: ['./minimal-product-grid.component.css']
 })
 export class MinimalProductGridComponent {
-    // Recibimos los datos del padre (AppComponent)
     @Input() adminProducts: Product[] = [];
     @Input() banners: BannerData = { banner1: '', banner2: '' };
 
     @Output() addToCart = new EventEmitter<string>();
+    @Output() cardClick = new EventEmitter<string>(); // ✅ NECESARIO PARA ABRIR EL DETALLE
 
-    // --- LÓGICA DE DISTRIBUCIÓN ---
+    // --- LÓGICA DE DISTRIBUCIÓN RESTAURADA ---
 
-    // 1. Primera Fila (Productos 0 al 3)
+    // Fila 1: Productos 0 al 3
     get firstRowProducts() {
         return this.adminProducts.slice(0, 4);
     }
 
-    // 2. Segunda Fila (Productos 4 al 7)
+    // Fila 2: Productos 4 al 7
     get secondRowProducts() {
         return this.adminProducts.slice(4, 8);
     }
 
-    // 3. Resto de Productos (Del 8 al final)
+    // Resto: Productos del 8 en adelante
     get remainingProducts() {
         return this.adminProducts.slice(8);
     }
 
-    // Evento click de la tarjeta
-    onCardClick(productId: string) {
+    // Click en "COMPRAR"
+    onAddToCartClick(productId: string) {
         this.addToCart.emit(productId);
+    }
+
+    // Click en la FOTO/TARJETA (Abre el detalle)
+    onCardClick(productId: string) {
+        this.cardClick.emit(productId);
     }
 }

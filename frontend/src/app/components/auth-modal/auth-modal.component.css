@@ -1,0 +1,157 @@
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 3000;
+    /* Encima de todo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-box {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    padding: 0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    /* Sin border-radius (Minimalista) */
+}
+
+.auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.auth-header h2 {
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.auth-content {
+    padding: 30px;
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: black;
+}
+
+.submit-btn {
+    width: 100%;
+    background: black;
+    color: white;
+    padding: 14px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.submit-btn:hover {
+    background: #333;
+}
+
+.switch-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    margin-top: 15px;
+    font-size: 11px;
+    color: #666;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.error-msg {
+    background: #fdf2f2;
+    color: #dc2626;
+    padding: 10px;
+    font-size: 11px;
+    margin-bottom: 15px;
+    border: 1px solid #fecaca;
+}
+
+/* Estado Logueado */
+.logged-in-view {
+    text-align: center;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    background: black;
+    color: white;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.welcome-text {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 5px;
+}
+
+.sub-text {
+    font-size: 12px;
+    color: #888;
+    margin: 0 0 25px;
+}
+
+.logout-btn {
+    background: white;
+    border: 1px solid black;
+    color: black;
+    padding: 10px 20px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: black;
+    color: white;
+}

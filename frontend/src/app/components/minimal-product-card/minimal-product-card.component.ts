@@ -6,7 +6,10 @@ import { CommonModule } from '@angular/common';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './minimal-product-card.component.html',
-    styleUrl: './minimal-product-card.component.css'
+    styleUrl: './minimal-product-card.component.css',
+    host: {
+        'class': 'block w-full h-full'
+    }
 })
 export class MinimalProductCardComponent implements OnChanges {
     @Input({ required: true }) id!: string;
@@ -19,9 +22,9 @@ export class MinimalProductCardComponent implements OnChanges {
     @Input() installments = 3;
 
     @Output() addToCart = new EventEmitter<string>();
+    @Output() cardClick = new EventEmitter<string>(); // NUEVO: Click en la tarjeta
 
     currentImage: string = '';
-    // Imagen de seguridad (asegúrate de que esta ruta exista o bórrala si no la quieres)
     fallbackImage = 'assets/CARDS/NEWstfu.png';
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -36,9 +39,14 @@ export class MinimalProductCardComponent implements OnChanges {
         }
     }
 
-    // 👇 ESTA ES LA FUNCIÓN QUE FALTABA (Renombrada para coincidir con el HTML)
+    // Click en el botón "COMPRAR"
     onAddToCartClick(event: Event): void {
-        event.stopPropagation(); // Evita que el click se propague si hubiera algo más
+        event.stopPropagation(); // Evita abrir el detalle
         this.addToCart.emit(this.id);
+    }
+
+    // Click en la imagen/tarjeta (para ver detalle)
+    onCardClick(): void {
+        this.cardClick.emit(this.id);
     }
 }

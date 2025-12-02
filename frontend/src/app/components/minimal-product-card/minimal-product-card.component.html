@@ -1,14 +1,14 @@
-<div class="card-container" (click)="onAddToCartClick($event)">
+<div class="group cursor-pointer" (click)="onCardClick()">
 
-    <div class="image-wrapper">
-        <img [src]="currentImage" (error)="handleImageError()" [alt]="name">
+    <div class="image-container">
+        <img [src]="currentImage" (error)="handleImageError()" [alt]="name" class="product-img">
 
         @if (salePercentage) {
         <div class="sale-badge">SALE</div>
         }
     </div>
 
-    <div class="info-wrapper">
+    <div class="info-container">
         <h3 class="product-name">{{ name }}</h3>
 
         <div class="price-row">
@@ -22,6 +22,7 @@
             {{ installments }} cuotas sin interés
         </p>
 
-        <button class="buy-btn">COMPRAR</button>
+        <button class="buy-btn" (click)="onAddToCartClick($event)">COMPRAR</button>
     </div>
+
 </div>

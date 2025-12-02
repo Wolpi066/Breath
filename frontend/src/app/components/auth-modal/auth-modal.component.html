@@ -1,0 +1,64 @@
+<div class="auth-overlay" (click)="close.emit()">
+    <div class="auth-box" (click)="$event.stopPropagation()">
+
+        <div class="auth-header">
+            <h2>
+                @if (currentUser) { MI CUENTA }
+                @else if (mode() === 'login') { INICIAR SESIÓN }
+                @else { CREAR CUENTA }
+            </h2>
+            <button class="close-btn" (click)="close.emit()">✕</button>
+        </div>
+
+        <div class="auth-content">
+
+            @if (currentUser) {
+            <div class="logged-in-view">
+                <div class="avatar">
+                    {{ currentUser.charAt(0).toUpperCase() }}
+                </div>
+                <p class="welcome-text">Hola, {{ currentUser }}</p>
+                <p class="sub-text">Tu sesión está activa</p>
+                <button class="logout-btn" (click)="onLogout()">CERRAR SESIÓN</button>
+            </div>
+            }
+
+            @else {
+            <form (ngSubmit)="onSubmit()" class="auth-form">
+
+                <div class="form-group">
+                    <label>USUARIO</label>
+                    <input type="text" [(ngModel)]="username" name="username" required>
+                </div>
+
+                @if (mode() === 'register') {
+                <div class="form-group">
+                    <label>EMAIL</label>
+                    <input type="email" [(ngModel)]="email" name="email" required>
+                </div>
+                }
+
+                <div class="form-group">
+                    <label>CONTRASEÑA</label>
+                    <input type="password" [(ngModel)]="password" name="password"
+                        [placeholder]="mode() === 'register' ? 'Mínimo 6 caracteres' : ''" required>
+                </div>
+
+                @if (error) {
+                <div class="error-msg">{{ error }}</div>
+                }
+
+                <button type="submit" class="submit-btn">
+                    {{ mode() === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA' }}
+                </button>
+
+                <button type="button" class="switch-btn" (click)="toggleMode()">
+                    {{ mode() === 'login' ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión' }}
+                </button>
+
+            </form>
+            }
+
+        </div>
+    </div>
+</div>

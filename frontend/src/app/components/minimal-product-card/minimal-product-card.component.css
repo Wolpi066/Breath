@@ -1,40 +1,35 @@
 :host {
     display: block;
     width: 100%;
+    /* Esto es vital: asegura que el componente ocupe el ancho de la celda del grid, no más */
 }
 
-.card-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    cursor: pointer;
-}
-
-/* CONTENEDOR DE IMAGEN (Ratio 3:4) */
-.image-wrapper {
+/* Contenedor de la imagen con proporción fija */
+.image-container {
     position: relative;
     width: 100%;
     aspect-ratio: 3 / 4;
-    /* Clave mágica de CSS */
-    background-color: #f4f4f4;
+    /* Fuerza rectángulo vertical */
+    background-color: #F4F4F4;
     overflow: hidden;
     margin-bottom: 12px;
 }
 
-.image-wrapper img {
+/* Imagen que llena el contenedor */
+.product-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Recorta, no deforma */
+    /* Recorta, no estira */
+    display: block;
     transition: transform 0.5s ease;
 }
 
-.card-container:hover .image-wrapper img {
+.group:hover .product-img {
     transform: scale(1.05);
-    /* Efecto zoom */
 }
 
-/* BADGE */
+/* Badge Sale */
 .sale-badge {
     position: absolute;
     top: 8px;
@@ -46,19 +41,24 @@
     padding: 4px 8px;
     border-radius: 2px;
     letter-spacing: 1px;
+    z-index: 10;
 }
 
-/* TEXTOS */
-.info-wrapper {
-    padding: 0 4px;
+/* Info del producto */
+.info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
 }
 
 .product-name {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin: 0 0 4px 0;
+    margin: 0;
     font-weight: normal;
+    width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -68,7 +68,6 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-bottom: 4px;
 }
 
 .price-original {
@@ -85,7 +84,7 @@
 .installments {
     font-size: 9px;
     color: #888;
-    margin: 0 0 8px 0;
+    margin: 0;
 }
 
 .buy-btn {
@@ -97,6 +96,8 @@
     letter-spacing: 1px;
     cursor: pointer;
     border-radius: 2px;
+    margin-top: 4px;
+    transition: background-color 0.2s;
 }
 
 .buy-btn:hover {

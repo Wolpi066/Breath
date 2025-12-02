@@ -1,19 +1,25 @@
+@if (selectedProduct()) {
+<app-product-detail [product]="selectedProduct()!" [currentUser]="currentUser()" (close)="selectedProduct.set(null)"
+    (addToCart)="addToCartWithSize($event)" (openCart)="openCart()"></app-product-detail>
+
+} @else {
+
 <div class="min-h-screen bg-black">
 
     @if (!isCartOpen()) {
-    <app-minimal-navbar [cartItemsCount]="cartItemsCount()" (cartClick)="openCart()" (navigate)="navigate($event)">
+    <app-minimal-navbar [cartItemsCount]="cartItemsCount()" [isLoggedIn]="!!currentUser()" (cartClick)="openCart()"
+        (authClick)="openAuth()" (navigate)="navigate($event)">
     </app-minimal-navbar>
-    }
-
-    @if (currentPage() === 'home') {
-    <app-hero></app-hero>
     }
 
     <main class="bg-white">
 
         @if (currentPage() === 'home') {
+
+        <app-hero></app-hero>
+
         <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()"
-            (addToCart)="addToCart($event)">
+            (addToCart)="addToCart($event)" (cardClick)="openProductDetail($event)">
         </app-minimal-product-grid>
 
         } @else if (currentPage() === 'productos') {
@@ -27,10 +33,11 @@
         </app-admin-dashboard>
 
         } @else {
-        <div style="padding-top: 150px; text-align: center;">
+        <div style="padding-top: 150px; text-align: center; height: 60vh;">
             <h1>PÁGINA EN CONSTRUCCIÓN</h1>
             <p>Sección: {{ currentPage() | uppercase }}</p>
-            <button (click)="navigate('home')">VOLVER AL INICIO</button>
+            <button (click)="navigate('home')"
+                style="margin-top:20px; padding:10px; background:black; color:white; cursor:pointer;">VOLVER</button>
         </div>
         }
     </main>
@@ -43,4 +50,10 @@
         (updateQuantity)="updateQuantity($event)" (removeItem)="removeItem($event)">
     </app-shopping-cart>
 
+    @if (isAuthOpen()) {
+    <app-auth-modal [currentUser]="currentUser()" (close)="closeAuth()" (login)="handleLogin($event)"
+        (register)="handleRegister($event)" (logout)="handleLogout()"></app-auth-modal>
+    }
+
 </div>
+}
