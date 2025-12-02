@@ -1,170 +1,137 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, OnInit, signal } from '@angular/core';
+import { CommonModule, CurrencyPipe } from '@angular/common'; // Agregué CurrencyPipe por si acaso
 import { FormsModule } from '@angular/forms';
-
-import { Product } from '../../models/product.model';
+import { Product, ProductSize } from '../../models/product.model';
 import { BannerData } from '../../models/banner.model';
-import { MinimalProductCardComponent } from '../minimal-product-card/minimal-product-card.component';
-
-export interface ProductSize { size: string; stock: number; }
 
 @Component({
     selector: 'app-admin-dashboard',
     standalone: true,
-    imports: [CommonModule, FormsModule, MinimalProductCardComponent],
+    imports: [CommonModule, FormsModule, CurrencyPipe],
     templateUrl: './admin-dashboard.component.html',
-    styleUrls: ['./admin-dashboard.component.css'],
+    styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent implements OnChanges {
+export class AdminDashboardComponent implements OnInit {
     @Input() products: Product[] = [];
-    @Input() banners: BannerData = { banner1: '', banner2: '' };
+    @Input() banners: BannerData | null = null;
+
     @Output() close = new EventEmitter<void>();
     @Output() saveProduct = new EventEmitter<Product>();
     @Output() deleteProduct = new EventEmitter<string>();
     @Output() saveBanners = new EventEmitter<BannerData>();
 
-    activeTab: 'productos' | 'banners' = 'productos';
-    filteredProducts: Product[] = [];
-    searchTerm = '';
-    categoryFilter = 'todos';
-    isEditing = false;
-    editingProduct: Product | null = null;
+    // 👇 CORRECCIÓN AQUÍ: Cambié 'products' a 'productos' para que coincida
+    activeTab = signal<'productos' | 'banners'>('productos');
 
-    formData = signal<Partial<Product>>({ category: 'remeras', price: 0, discount: 0, sizes: [{ size: 'S', stock: 0 }] });
+    // -- PRODUCTOS --
+    editingProduct = signal<Product | null>(null);
+    formData: Partial<Product> = {};
 
-    mainImagePreview = signal<string | null>(null);
-    hoverImagePreview = signal<string | null>(null);
-    banner1Preview = signal<string | null>(null);
-    banner2Preview = signal<string | null>(null);
+    // -- BANNERS --
+    banner1Preview = signal<string>('');
+    banner2Preview = signal<string>('');
 
-    categoriesOptions = ['remeras', 'buzos', 'pantalones', 'gorras', 'otro'];
-    sizesOptions = ['S', 'M', 'L', 'XL', 'XXL', 'Única'];
+    // Helpers
+    categories = ['buzos', 'remeras', 'pantalones', 'gorras', 'otro'];
+    defaultSizes = ['S', 'M', 'L', 'XL', 'XXL', 'Única'];
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['products']) { this.applyFilters(); }
-        if (changes['banners']) {
-            this.banner1Preview.set(this.banners?.banner1 || null);
-            this.banner2Preview.set(this.banners?.banner2 || null);
+    ngOnInit() {
+        if (this.banners) {
+            this.banner1Preview.set(this.banners.banner1 || '');
+            this.banner2Preview.set(this.banners.banner2 || '');
         }
     }
 
-    setTab(tab: 'productos' | 'banners'): void {
-        this.activeTab = tab;
+    // --- NAVEGACIÓN ---
+    // 👇 CORRECCIÓN AQUÍ TAMBIÉN: El tipo del parámetro
+    setTab(tab: 'productos' | 'banners') {
+        this.activeTab.set(tab);
+        if (tab === 'banners') this.cancelEdit();
+    }
+
+    onClose() {
+        this.close.emit();
+    }
+
+    // --- LÓGICA PRODUCTOS ---
+    startNewProduct() {
+        this.editingProduct.set({
+            id: '', name: '', description: '', category: 'remeras',
+            price: 0, discount: 0, sizes: [], mainImage: '', hoverImage: ''
+        } as Product);
+        this.formData = { ...this.editingProduct()! };
+    }
+
+    startEdit(product: Product) {
+        this.editingProduct.set(product);
+        this.formData = JSON.parse(JSON.stringify(product));
+    }
+
+    cancelEdit() {
+        this.editingProduct.set(null);
+        this.formData = {};
+    }
+
+    addSize() {
+        const currentSizes = this.formData.sizes || [];
+        this.formData.sizes = [...currentSizes, { size: 'M', stock: 0 }];
+    }
+
+    removeSize(index: number) {
+        if (this.formData.sizes) {
+            this.formData.sizes.splice(index, 1);
+        }
+    }
+
+    onSubmitProduct() {
+        if (!this.formData.name || !this.formData.price) {
+            alert('Nombre y precio son obligatorios');
+            return;
+        }
+
+        const productToSave: Product = {
+            ...this.formData as Product,
+            id: this.formData.id || Date.now().toString()
+        };
+
+        this.saveProduct.emit(productToSave);
         this.cancelEdit();
+        alert('Producto guardado correctamente');
     }
 
-    getCategoryLabel(category: string | undefined): string {
-        switch (category) {
-            case 'remeras': return 'REMERAS'; case 'buzos': return 'BUZOS';
-            case 'pantalones': return 'PANTALONES'; case 'gorras': return 'GORRAS';
-            default: return 'OTRO';
+    onDeleteProduct(id: string) {
+        if (confirm('¿Eliminar producto?')) {
+            this.deleteProduct.emit(id);
+            this.cancelEdit();
         }
     }
 
-    getSizesLabel(product: Product): string {
-        if (!product || !product.sizes) return '';
-        return product.sizes.map((s) => `${s.size}(${s.stock})`).join(', ');
-    }
-
-    applyFilters(): void {
-        const list = this.products || [];
-        this.filteredProducts = list.filter((p) => {
-            const search = this.searchTerm.trim().toLowerCase();
-            const name = p.name.toLowerCase();
-            const matchSearch = !search || name.includes(search);
-            const matchCategory = this.categoryFilter === 'todos' || p.category === this.categoryFilter;
-            return matchSearch && matchCategory;
-        });
-    }
-
-    onCategoryChange(category: string): void {
-        this.categoryFilter = category;
-        this.applyFilters();
-    }
-
-    newProduct(): void {
-        this.isEditing = true;
-        this.editingProduct = { id: '', name: '', description: '', category: 'remeras', price: 0, discount: 0, sizes: [{ size: 'S', stock: 0 }], mainImage: '', hoverImage: '' };
-        this.mainImagePreview.set(null);
-        this.hoverImagePreview.set(null);
-    }
-
-    editProduct(product: Product): void {
-        this.isEditing = true;
-        this.editingProduct = JSON.parse(JSON.stringify(product));
-        this.mainImagePreview.set(product.mainImage);
-        this.hoverImagePreview.set(product.hoverImage ?? null);
-    }
-
-    cancelEdit(): void {
-        this.isEditing = false;
-        this.editingProduct = null;
-        this.mainImagePreview.set(null);
-        this.hoverImagePreview.set(null);
-    }
-
-    handleImageUpload(event: Event, type: 'mainImage' | 'hoverImage' | 'banner1' | 'banner2') {
+    // --- LÓGICA IMÁGENES ---
+    handleImageUpload(event: Event, type: 'main' | 'hover' | 'banner1' | 'banner2') {
         const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
+        if (!input.files?.length) return;
+
         const file = input.files[0];
         const reader = new FileReader();
 
         reader.onload = () => {
-            const base64String = reader.result as string;
-            if (type === 'mainImage') { this.mainImagePreview.set(base64String); this.formData.update(data => ({ ...data, mainImage: base64String })); }
-            else if (type === 'hoverImage') { this.hoverImagePreview.set(base64String); this.formData.update(data => ({ ...data, hoverImage: base64String })); }
-            else if (type === 'banner1') { this.banner1Preview.set(base64String); }
-            else if (type === 'banner2') { this.banner2Preview.set(base64String); }
+            const result = reader.result as string;
+
+            if (type === 'main') this.formData.mainImage = result;
+            if (type === 'hover') this.formData.hoverImage = result;
+            if (type === 'banner1') this.banner1Preview.set(result);
+            if (type === 'banner2') this.banner2Preview.set(result);
         };
+
         reader.readAsDataURL(file);
     }
 
-    handleAddSize() { this.formData.update(data => ({ ...data, sizes: [...(data.sizes || []), { size: 'M', stock: 0 } as ProductSize] })); }
-
-    handleRemoveSize(index: number) { this.formData.update(data => ({ ...data, sizes: data.sizes?.filter((_, i) => i !== index) })); }
-
-    handleUpdateSize(index: number, field: 'size' | 'stock', event: Event) {
-        const value = (event.target as HTMLInputElement).value;
-        const stockValue = field === 'stock' ? parseInt(value) || 0 : value;
-        this.formData.update(data => {
-            const newSizes = [...(data.sizes || [])];
-            newSizes[index] = { ...newSizes[index], [field]: stockValue } as ProductSize;
-            return { ...data, sizes: newSizes };
+    // --- LÓGICA BANNERS ---
+    onSaveBanners() {
+        this.saveBanners.emit({
+            banner1: this.banner1Preview(),
+            banner2: this.banner2Preview()
         });
-    }
-
-    handleSubmit(e: Event) {
-        e.preventDefault();
-        const data = this.formData();
-        if (!data.name || data.price === undefined || !this.mainImagePreview()) { alert("Faltan campos requeridos."); return; }
-        if (!data.sizes || data.sizes.length === 0) { alert("Debe agregar al menos un talle."); return; }
-
-        const finalProduct: Product = {
-            ...this.editingProduct,
-            ...data,
-            id: this.editingProduct?.id || Date.now().toString(),
-            hoverImage: data.hoverImage || data.mainImage || '',
-            description: data.description || '',
-            mainImage: this.mainImagePreview() || ''
-        } as Product;
-
-        this.saveProduct.emit(finalProduct);
-        this.cancelEdit();
-    }
-
-    handleDelete(id: string) {
-        if (confirm('¿Seguro que deseas eliminar este producto?')) {
-            this.deleteProduct.emit(id);
-        }
-    }
-
-    handleSaveBanners() {
-        const newBanners: BannerData = {
-            banner1: this.banner1Preview() || '',
-            banner2: this.banner2Preview() || '',
-        };
-        this.saveBanners.emit(newBanners);
-        alert('Banners guardados correctamente.');
-        this.close.emit();
+        alert('Banners guardados correctamente');
     }
 }

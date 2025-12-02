@@ -1,14 +1,12 @@
 /* --- LAYOUT GENERAL --- */
 .page-container {
     padding-top: 80px;
-    /* Espacio para el Navbar Fixed */
     padding-bottom: 80px;
     background-color: white;
     min-height: 100vh;
 }
 
 .content-wrapper {
-    /* Layout Desktop: Flex */
     display: flex;
     max-width: 100%;
     padding: 0 24px;
@@ -17,10 +15,8 @@
 /* --- SIDEBAR (Estilos Base) --- */
 .sidebar {
     width: 250px;
-    /* Ancho fijo desktop */
+    padding: 0 40px 0 24px;
     flex-shrink: 0;
-    padding-right: 40px;
-    /* En desktop es estático, en móvil cambiará a fixed */
 }
 
 .filter-group {
@@ -72,7 +68,6 @@
 
 .checkbox-item input {
     display: none;
-    /* Ocultamos el nativo */
 }
 
 /* Checkbox personalizado */
@@ -135,6 +130,13 @@
     outline: none;
 }
 
+/* Para Chrome, Edge, Safari */
+.price-input input::-webkit-outer-spin-button,
+.price-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 .clear-btn {
     background: none;
     border: none;
@@ -149,7 +151,6 @@
 /* --- GRID AREA --- */
 .grid-area {
     flex: 1;
-    /* Ocupa el resto del espacio */
 }
 
 .desktop-header {
@@ -165,10 +166,8 @@
 
 .products-grid {
     display: grid;
-    /* Desktop: 3 columnas */
     grid-template-columns: repeat(3, 1fr);
     gap: 64px 16px;
-    /* Vertical 64px, Horizontal 16px */
 }
 
 /* Pantallas muy grandes: 4 columnas */
@@ -197,7 +196,7 @@
     text-transform: uppercase;
 }
 
-/* --- ESTILOS MÓVILES --- */
+/* --- ESTILOS MÓVILES (RESTO SE MANTIENE) --- */
 .mobile-controls {
     display: none;
 }
@@ -224,8 +223,6 @@
     .desktop-header {
         display: none;
     }
-
-    /* Ocultamos header desktop */
 
     /* Header Móvil */
     .mobile-controls {
@@ -259,7 +256,6 @@
         z-index: 2000;
         padding: 0;
         transform: translateX(100%);
-        /* Oculto */
         transition: transform 0.3s ease;
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
         display: flex;
@@ -270,8 +266,7 @@
         transform: translateX(0);
     }
 
-    /* Visible */
-
+    /* Header Móvil del Sidebar */
     .sidebar-header-mobile {
         display: flex;
         justify-content: space-between;
