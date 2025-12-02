@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiurl: 'http://localhost/Breath/public/api/',
+    apiurl: 'http://localhost/Breath/backend/',
 };
