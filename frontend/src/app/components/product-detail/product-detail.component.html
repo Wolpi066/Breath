@@ -75,6 +75,7 @@
                 </div>
                 }
             </div>
+
             @if (currentUser) {
             <div class="review-form">
                 <h4>ESCRIBIR RESEÑA</h4>
@@ -83,6 +84,11 @@
                         (mouseleave)="hoverRating=0" (click)="rating=i">★</span> }</div>
                 <textarea [(ngModel)]="comment"></textarea>
                 <button (click)="submitReview()">PUBLICAR</button>
+            </div>
+            } @else {
+            <div class="login-prompt">
+                <p>PARA ESCRIBIR UNA RESEÑA DEBES INICIAR SESIÓN</p>
+                <button (click)="onLoginClick()">INICIAR SESIÓN</button>
             </div>
             }
         </div>

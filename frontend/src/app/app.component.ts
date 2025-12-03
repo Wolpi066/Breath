@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { MinimalProductGridComponent } from './components/minimal-product-grid/minimal-product-grid.component';
-// ✅ CORREGIDO: Importa desde el archivo con 's' al final
 import { ProductsPageComponent } from './components/products-page/products-page.components';
 import { MinimalFooterComponent } from './components/minimal-footer/minimal-footer.component';
 import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.component';
@@ -28,7 +27,7 @@ const banner2Img = 'assets/CARDS/wmremove-transformed.png';
     MinimalNavbarComponent,
     HeroComponent,
     MinimalProductGridComponent,
-    ProductsPageComponent, // Angular ahora encontrará el archivo correcto
+    ProductsPageComponent,
     MinimalFooterComponent,
     ShoppingCartComponent,
     AdminDashboardComponent,
@@ -105,6 +104,13 @@ export class AppComponent implements OnInit {
   openAuth() { this.isAuthOpen.set(true); }
   closeAuth() { this.isAuthOpen.set(false); }
 
+  // ✅ NUEVO MÉTODO: Maneja el login desde el detalle
+  handleAuthRedirect() {
+    this.selectedProduct.set(null); // 1. Cierra el detalle
+    this.navigate('home');          // 2. Va al home
+    this.openAuth();                // 3. Abre el modal de login
+  }
+
   openProductDetail(productId: string) {
     const p = this.adminProducts().find(x => x.id === productId);
     if (p) this.selectedProduct.set(p);
@@ -138,7 +144,6 @@ export class AppComponent implements OnInit {
     this.addItemToCart(product, 'Única');
   }
 
-  // ✅ AHORA USA LA CANTIDAD SELECCIONADA
   addToCartWithSize(data: { id: string, size: string, quantity: number }) {
     const product = this.adminProducts().find((p) => p.id === data.id);
     if (!product) return;
@@ -152,7 +157,7 @@ export class AppComponent implements OnInit {
     } else {
       this.cart.update(prev => [...prev, {
         id: cartItemId, name: product.name, price: finalPrice,
-        quantity: data.quantity, // USAMOS LA CANTIDAD DEL SELECTOR
+        quantity: data.quantity,
         image: product.mainImage, size: data.size
       }]);
     }

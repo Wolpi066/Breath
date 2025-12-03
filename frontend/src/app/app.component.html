@@ -1,6 +1,7 @@
 @if (selectedProduct()) {
 <app-product-detail [product]="selectedProduct()!" [currentUser]="currentUser()" (close)="selectedProduct.set(null)"
-    (addToCart)="addToCartWithSize($event)" (openCart)="openCart()"></app-product-detail>
+    (addToCart)="addToCartWithSize($event)" (openCart)="openCart()" (openAuth)="handleAuthRedirect()">
+</app-product-detail>
 
 } @else {
 <div class="min-h-screen bg-black">
