@@ -16,9 +16,9 @@ export class MinimalProductGridComponent {
     @Input() banners: BannerData = { banner1: '', banner2: '' };
 
     @Output() addToCart = new EventEmitter<string>();
-    @Output() cardClick = new EventEmitter<string>(); // ✅ NECESARIO PARA ABRIR EL DETALLE
+    @Output() cardClick = new EventEmitter<string>();
 
-    // --- LÓGICA DE DISTRIBUCIÓN RESTAURADA ---
+    // --- LÓGICA DE DISTRIBUCIÓN ---
 
     // Fila 1: Productos 0 al 3
     get firstRowProducts() {
@@ -35,12 +35,11 @@ export class MinimalProductGridComponent {
         return this.adminProducts.slice(8);
     }
 
-    // Click en "COMPRAR"
+    // Eventos
     onAddToCartClick(productId: string) {
         this.addToCart.emit(productId);
     }
 
-    // Click en la FOTO/TARJETA (Abre el detalle)
     onCardClick(productId: string) {
         this.cardClick.emit(productId);
     }

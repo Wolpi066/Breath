@@ -22,33 +22,30 @@
     margin: 0;
 }
 
-/* --- CONTENEDOR --- */
-/* Usamos un padding lateral estándar para que no toque los bordes del monitor si no quieres Full Bleed extremo, 
-   o padding: 0 si lo quieres pegado. Aquí pongo uno seguro para diseño limpio. */
+/* --- CONTENEDOR (Full Bleed) --- */
 .grid-wrapper {
     width: 100%;
-    max-width: 1920px;
-    /* Límite para pantallas ultra anchas */
-    margin: 0 auto;
-    padding: 0 20px;
-    /* Margen de seguridad a los costados */
+    padding: 0;
+    /* Sin márgenes laterales */
     box-sizing: border-box;
 }
 
-/* --- GRILLA DE PRODUCTOS (La Clave de las 4 columnas) --- */
+/* --- GRILLA DE PRODUCTOS --- */
 .product-grid {
     display: grid;
     width: 100%;
 
     /* Mobile: 2 Columnas */
     grid-template-columns: repeat(2, 1fr);
+
+    /* Espaciado: 48px vertical, 12px horizontal */
     gap: 48px 12px;
-    /* Vertical / Horizontal */
 
     margin-bottom: 64px;
+    /* Espacio antes del siguiente banner */
 }
 
-/* Desktop: 4 Columnas (Aquí es donde se arregla lo gigante) */
+/* Desktop: 4 Columnas Exactas */
 @media (min-width: 1024px) {
     .product-grid {
         grid-template-columns: repeat(4, 1fr);

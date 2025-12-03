@@ -1,6 +1,7 @@
-import { Component, HostListener, signal, computed } from '@angular/core';
+import { Component, HostListener, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// Componentes
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { MinimalProductGridComponent } from './components/minimal-product-grid/minimal-product-grid.component';
@@ -10,88 +11,71 @@ import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
 import { ProductDetailComponent } from './components/product-detail/product-detail.component';
+
+// Modelos y Servicios
 import { Product } from './models/product.model';
 import { BannerData } from './models/banner.model';
+import { AuthService } from './services/auth.service';
+import { ProductService } from './services/product.service';
 
-// --- RUTAS DE IMÁGENES ---
-const buzoBreathe = 'assets/CARDS/NEWstfu.png';
-const buzoBreatheAstronaut = 'assets/CARDS/NEWapollo.png';
-const buzoHopeless = 'assets/CARDS/NEWhopeless.png';
-const remeraParadise = 'assets/CARDS/NEWparadise.png';
-const buzoRoswell = 'assets/CARDS/NEWroswell.png';
-const buzoTragedy = 'assets/CARDS/NEWtragedy.png';
-const remeraCupidWhite = 'assets/CARDS/NEWcupidBlanca.png';
-const remeraLastHit = 'assets/CARDS/NEWlasthit.png';
-const remeraCupidBlack = 'assets/CARDS/NEWcupidNegra.png';
-const gorraWhite = 'assets/CARDS/NEWgorraBlanca.png';
-const gorraBlack = 'assets/CARDS/NEWgorraNegra.png';
+// Rutas de imágenes fallback (por si la DB falla)
 const banner1Img = 'assets/CARDS/calleNoche.jpg';
 const banner2Img = 'assets/CARDS/wmremove-transformed.png';
-
-// --- LISTA MAESTRA (Simula el JSON que devolverá tu PHP con JOIN) ---
-const INITIAL_PRODUCTS: Product[] = [
-  { id: '1', name: 'HOODIE BREATHE MASK', description: 'Buzo con capucha diseño máscara y "breathe"', category: 'buzos', price: 85, discount: 0, sizes: [{ size: 'S', stock: 7 }, { size: 'M', stock: 11 }, { size: 'L', stock: 9 }, { size: 'XL', stock: 5 }], mainImage: buzoBreathe, hoverImage: buzoBreathe },
-  { id: '2', name: 'HOODIE BREATHE ASTRONAUT', description: 'Buzo con capucha diseño "breathe" y astronauta rojo', category: 'buzos', price: 90, discount: 0, sizes: [{ size: 'S', stock: 6 }, { size: 'M', stock: 10 }, { size: 'L', stock: 8 }, { size: 'XL', stock: 4 }], mainImage: buzoBreatheAstronaut, hoverImage: buzoBreatheAstronaut },
-  { id: '3', name: 'HOODIE HOPELESS STATUE', description: 'Buzo con capucha diseño "HOPELESS" y escultura clásica', category: 'buzos', price: 95, discount: 20, sizes: [{ size: 'S', stock: 6 }, { size: 'M', stock: 10 }, { size: 'L', stock: 8 }, { size: 'XL', stock: 5 }], mainImage: buzoHopeless, hoverImage: buzoHopeless },
-  { id: '4', name: 'T-SHIRT PARADISE', description: 'Remera blanca "Another day in Paradise" con paisaje tropical', category: 'remeras', price: 40, discount: 0, sizes: [{ size: 'S', stock: 10 }, { size: 'M', stock: 15 }, { size: 'L', stock: 12 }, { size: 'XL', stock: 8 }], mainImage: remeraParadise, hoverImage: remeraParadise },
-  { id: '5', name: 'HOODIE ROSWELL RECORD', description: 'Buzo con capucha diseño "Roswell Daily Record"', category: 'buzos', price: 90, discount: 15, sizes: [{ size: 'S', stock: 6 }, { size: 'M', stock: 10 }, { size: 'L', stock: 8 }, { size: 'XL', stock: 4 }], mainImage: buzoRoswell, hoverImage: buzoRoswell },
-  { id: '6', name: 'HOODIE TRAGEDY', description: 'Buzo con capucha "Thank you for the tragedy"', category: 'buzos', price: 85, discount: 0, sizes: [{ size: 'S', stock: 8 }, { size: 'M', stock: 12 }, { size: 'L', stock: 10 }, { size: 'XL', stock: 6 }], mainImage: buzoTragedy, hoverImage: buzoTragedy },
-  { id: '7', name: 'T-SHIRT WHO SHOT CUPID WHITE', description: 'Remera blanca "who shot cupid?" con cupido atravesado', category: 'remeras', price: 42, discount: 10, sizes: [{ size: 'S', stock: 12 }, { size: 'M', stock: 18 }, { size: 'L', stock: 14 }, { size: 'XL', stock: 10 }], mainImage: remeraCupidWhite, hoverImage: remeraCupidWhite },
-  { id: '8', name: 'T-SHIRT LAST HIT', description: 'Remera negra "last hit" con pintura renacentista de cupido', category: 'remeras', price: 45, discount: 0, sizes: [{ size: 'S', stock: 10 }, { size: 'M', stock: 16 }, { size: 'L', stock: 12 }, { size: 'XL', stock: 8 }], mainImage: remeraLastHit, hoverImage: remeraLastHit },
-  { id: '9', name: 'T-SHIRT WHO SHOT CUPID BLACK', description: 'Remera negra "who shot cupid?" con cupido atravesado', category: 'remeras', price: 42, discount: 0, sizes: [{ size: 'S', stock: 14 }, { size: 'M', stock: 20 }, { size: 'L', stock: 16 }, { size: 'XL', stock: 12 }], mainImage: remeraCupidBlack, hoverImage: remeraCupidBlack },
-  { id: '10', name: 'CAP BREATHE WHITE', description: 'Gorra blanca con bordado "breathe"', category: 'gorras', price: 30, discount: 0, sizes: [{ size: 'Única', stock: 25 }], mainImage: gorraWhite, hoverImage: gorraWhite },
-  { id: '11', name: 'CAP BREATHE BLACK', description: 'Gorra negra con bordado "breathe"', category: 'gorras', price: 30, discount: 0, sizes: [{ size: 'Única', stock: 30 }], mainImage: gorraBlack, hoverImage: gorraBlack },
-];
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule,
-    MinimalNavbarComponent,
-    HeroComponent,
-    MinimalProductGridComponent,
-    ProductsPageComponent,
-    MinimalFooterComponent,
-    ShoppingCartComponent,
-    AdminDashboardComponent,
-    AuthModalComponent,
-    ProductDetailComponent
+    CommonModule, MinimalNavbarComponent, HeroComponent, MinimalProductGridComponent,
+    ProductsPageComponent, MinimalFooterComponent, ShoppingCartComponent,
+    AdminDashboardComponent, AuthModalComponent, ProductDetailComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+
+  // Inyección de Servicios
+  private authService = inject(AuthService);
+  private productService = inject(ProductService);
 
   // --- ESTADO ---
   currentPage = signal<'home' | 'productos' | 'contacto' | 'about' | 'admin'>('home');
-  cart = signal<{ id: string; name: string; price: number; quantity: number; image: string; size?: string }[]>([]);
-  isCartOpen = signal(false);
-  isAdminOpen = signal(false);
-  adminProducts = signal<Product[]>([]);
-  banners = signal<BannerData>({ banner1: banner1Img, banner2: banner2Img });
 
-  currentUser = signal<string | null>(null);
+  cart = signal<{ id: string; name: string; price: number; quantity: number; image: string; size?: string }[]>([]);
+  cartItemsCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
+
+  // UI States
+  isCartOpen = signal(false);
   isAuthOpen = signal(false);
   selectedProduct = signal<Product | null>(null);
 
-  cartItemsCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
+  // Data Real (Viene del Backend)
+  adminProducts = signal<Product[]>([]);
+  banners = signal<BannerData>({ banner1: banner1Img, banner2: banner2Img });
 
-  constructor() {
-    if (INITIAL_PRODUCTS.length > 0) {
-      this.adminProducts.set(INITIAL_PRODUCTS);
-      localStorage.setItem('breath-products', JSON.stringify(INITIAL_PRODUCTS));
-    } else {
-      const saved = localStorage.getItem('breath-products');
-      if (saved) this.adminProducts.set(JSON.parse(saved));
-      else this.adminProducts.set([]);
-    }
+  // Auth State (Conectado al servicio)
+  currentUser = this.authService.currentUser; // Signal enlazada al servicio
 
-    const savedBanners = localStorage.getItem('breath-banners');
-    if (savedBanners) this.banners.set(JSON.parse(savedBanners));
+  ngOnInit() {
+    this.loadDataFromBackend();
+  }
 
-    const savedUser = localStorage.getItem('breath-current-user');
-    if (savedUser) this.currentUser.set(savedUser);
+  // --- CARGA DE DATOS REALES ---
+  loadDataFromBackend() {
+    this.productService.getProducts().subscribe({
+      next: (data) => {
+        console.log('📦 Productos cargados desde MySQL:', data);
+        this.adminProducts.set(data);
+      },
+      error: (err) => {
+        console.error('❌ Error conectando al Backend:', err);
+        alert('Error de conexión con el servidor. Revisa que XAMPP esté corriendo.');
+      }
+    });
+
+    // Banners
+    this.banners.set(this.productService.getBanners());
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -109,84 +93,73 @@ export class AppComponent {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // --- UI ---
   openCart() { this.isCartOpen.set(true); }
   closeCart() { this.isCartOpen.set(false); }
-
-  // --- AUTH ---
   openAuth() { this.isAuthOpen.set(true); }
   closeAuth() { this.isAuthOpen.set(false); }
 
-  handleLogin(data: { user: string, pass: string }) {
-    this.currentUser.set(data.user);
-    localStorage.setItem('breath-current-user', data.user);
-    this.closeAuth();
-  }
-
-  handleRegister(data: any) {
-    this.currentUser.set(data.user);
-    localStorage.setItem('breath-current-user', data.user);
-    this.closeAuth();
-  }
-
-  handleLogout() {
-    this.currentUser.set(null);
-    localStorage.removeItem('breath-current-user');
-    this.closeAuth();
-  }
-
-  // --- DETALLE PRODUCTO ---
   openProductDetail(productId: string) {
     const p = this.adminProducts().find(x => x.id === productId);
     if (p) this.selectedProduct.set(p);
+  }
+
+  // --- AUTH ACTIONS (Reales) ---
+  handleLogin(data: { user: string, pass: string }) {
+    this.authService.login(data.user, data.pass).subscribe({
+      next: () => {
+        this.closeAuth();
+        // alert('Bienvenido ' + data.user);
+      },
+      error: (err) => alert('Login fallido: ' + (err.error?.error || 'Credenciales incorrectas'))
+    });
+  }
+
+  handleRegister(data: any) {
+    this.authService.register(data.user, data.email, data.pass).subscribe({
+      next: () => {
+        this.closeAuth();
+        alert('Registro exitoso. Inicia sesión.');
+        this.openAuth();
+      },
+      error: (err) => alert('Error registro: ' + (err.error?.error || 'Intenta de nuevo'))
+    });
+  }
+
+  handleLogout() {
+    this.authService.logout();
+    this.closeAuth();
+    this.navigate('home');
   }
 
   // --- CARRITO ---
   addToCart(productId: string) {
     const product = this.adminProducts().find((p) => p.id === productId);
     if (!product) return;
-
-    const defaultSize = 'Única';
-    const cartItemId = `${product.id}-${defaultSize}`;
-
-    const existing = this.cart().find((i) => i.id === cartItemId);
-    if (existing) {
-      this.cart.update((prev) => prev.map((i) => i.id === cartItemId ? { ...i, quantity: i.quantity + 1 } : i));
-    } else {
-      this.cart.update((prev) => [...prev, {
-        id: cartItemId,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        image: product.mainImage,
-        size: defaultSize
-      }]);
-    }
-    console.log('Producto agregado (Silencioso)');
+    this.addItemToCart(product, 'Única');
   }
 
   addToCartWithSize(data: { id: string, size: string }) {
     const product = this.adminProducts().find((p) => p.id === data.id);
     if (!product) return;
+    this.addItemToCart(product, data.size);
+    this.selectedProduct.set(null);
+    this.openCart();
+  }
 
+  private addItemToCart(product: Product, size: string) {
     const finalPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price;
-    const cartItemId = `${product.id}-${data.size}`;
+    const cartItemId = `${product.id}-${size}`;
 
     const existing = this.cart().find((i) => i.id === cartItemId);
     if (existing) {
-      this.cart.update((prev) => prev.map((i) => i.id === cartItemId ? { ...i, quantity: i.quantity + 1 } : i));
+      this.cart.update(prev => prev.map(i => i.id === cartItemId ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      this.cart.update((prev) => [...prev, {
-        id: cartItemId,
-        name: product.name,
-        price: finalPrice,
-        quantity: 1,
-        image: product.mainImage,
-        size: data.size
+      this.cart.update(prev => [...prev, {
+        id: cartItemId, name: product.name, price: finalPrice,
+        quantity: 1, image: product.mainImage, size: size
       }]);
     }
-
-    this.selectedProduct.set(null);
-    this.openCart();
   }
 
   updateQuantity(event: { id: string; quantity: number }) {
@@ -198,22 +171,41 @@ export class AppComponent {
     this.cart.update((prev) => prev.filter((i) => i.id !== id));
   }
 
-  // --- ADMIN CRUD ---
+  // --- ADMIN CRUD (Conectado al Backend) ---
   saveProduct(product: Product) {
-    const exists = this.adminProducts().some((p) => p.id === product.id);
-    let newList = exists ? this.adminProducts().map((p) => p.id === product.id ? product : p) : [...this.adminProducts(), product];
-    this.adminProducts.set(newList);
-    localStorage.setItem('breath-products', JSON.stringify(newList));
+    // Si tiene ID y existe en la lista, es Edición
+    if (product.id && this.adminProducts().some(p => p.id === product.id)) {
+      this.productService.updateProduct(product).subscribe({
+        next: () => {
+          this.loadDataFromBackend(); // Recarga real
+          alert('Producto actualizado');
+        },
+        error: (err) => alert('Error al actualizar: ' + err.message)
+      });
+    } else {
+      // Crear Nuevo
+      this.productService.createProduct(product).subscribe({
+        next: () => {
+          this.loadDataFromBackend(); // Recarga real
+          alert('Producto creado');
+        },
+        error: (err) => alert('Error al crear: ' + err.message)
+      });
+    }
   }
 
   deleteProduct(id: string) {
-    const newList = this.adminProducts().filter((p) => p.id !== id);
-    this.adminProducts.set(newList);
-    localStorage.setItem('breath-products', JSON.stringify(newList));
+    this.productService.deleteProduct(id).subscribe({
+      next: () => {
+        this.loadDataFromBackend(); // Recarga real
+        alert('Producto eliminado');
+      },
+      error: (err) => alert('Error al eliminar: ' + err.message)
+    });
   }
 
   saveBanners(newBanners: BannerData) {
+    this.productService.saveBanners(newBanners);
     this.banners.set(newBanners);
-    localStorage.setItem('breath-banners', JSON.stringify(newBanners));
   }
 }
