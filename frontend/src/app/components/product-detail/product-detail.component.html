@@ -1,19 +1,13 @@
 <div class="detail-page">
-
     <header class="detail-header">
         <button class="back-btn" (click)="close.emit()">‹ VOLVER</button>
-        <div class="header-logo">
-            <img src="assets/breathe/logoBreatheBlanco.png" class="logo-img-black" alt="Breathe">
-        </div>
+        <div class="header-logo"><img src="assets/breathe/logoBreatheBlanco.png" class="logo-img-black"></div>
         <button class="close-icon" (click)="close.emit()">✕</button>
     </header>
 
     <div class="detail-container">
         <div class="detail-grid">
-
-            <div class="image-section">
-                <img [src]="product.mainImage" [alt]="product.name">
-            </div>
+            <div class="image-section"><img [src]="product.mainImage"></div>
 
             <div class="info-section">
                 <h1 class="product-title">{{ product.name }}</h1>
@@ -25,84 +19,76 @@
                     <span class="original-price">${{ (product.price / (1 - product.discount/100)) | number:'1.0-0'
                         }}</span>
                     <span class="discount-badge">-{{ product.discount }}%</span>
-                    } @else {
-                    <span class="current-price">${{ product.price }}</span>
-                    }
+                    } @else { <span class="current-price">${{ product.price }}</span> }
                 </div>
-
                 <div class="shipping-banner">ENVÍO GRATIS A TODO EL PAÍS</div>
 
                 <div class="sizes-grid">
                     @for (s of product.sizes; track s.size) {
-                    <button class="size-btn" [class.selected]="selectedSize() === s.size"
-                        [class.disabled]="s.stock === 0" [disabled]="s.stock === 0" (click)="selectedSize.set(s.size)">
-                        {{ s.size }}
-                    </button>
+                    <button class="size-btn" [class.selected]="selectedSize() === s.size" [disabled]="s.stock === 0"
+                        [class.disabled]="s.stock === 0" (click)="selectedSize.set(s.size)">{{ s.size }}</button>
                     }
                 </div>
+                @if (selectedSize()) { <p class="stock-info">Stock: {{ getStock(selectedSize()!) }}</p> }
 
-                @if (selectedSize()) {
-                <p class="stock-info">Stock: {{ getStock(selectedSize()!) }}</p>
-                }
+                <div class="actions-row" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <div class="qty-selector" style="display: flex; border: 1px solid #ccc; align-items: center;">
+                        <button (click)="decrementQty()"
+                            style="padding: 10px 15px; background: none; border: none; cursor: pointer;">-</button>
+                        <span style="padding: 0 10px; font-size: 12px;">{{ quantity() }}</span>
+                        <button (click)="incrementQty()"
+                            style="padding: 10px 15px; background: none; border: none; cursor: pointer;">+</button>
+                    </div>
 
-                <button class="add-btn" [disabled]="!selectedSize()" (click)="onAddToCartClick()">
-                    AGREGAR AL CARRITO
-                </button>
+                    <button class="add-btn" [disabled]="!selectedSize()" (click)="onAddToCartClick()"
+                        style="flex: 1; margin-bottom: 0;">
+                        AGREGAR AL CARRITO
+                    </button>
+                </div>
 
-                @if (product.description) {
-                <div class="description-box">
+                @if (product.description) { <div class="description-box">
                     <h3>DESCRIPCIÓN</h3>
                     <p>{{ product.description }}</p>
+                </div> }
+                <div class="extra-info">
+                    <p>• 100% Algodón premium</p>
+                    <p>• Corte regular fit</p>
+                    <p>• Lavado a máquina máx. 30°</p>
+                    <p>• Hecho en Argentina</p>
                 </div>
-                }
             </div>
         </div>
 
         <div class="reviews-section">
             <h3 class="reviews-title">RESEÑAS ({{ reviews().length }})</h3>
-
-            @if (reviews().length === 0) {
-            <p class="no-reviews">Aún no hay reseñas. ¡Sé el primero!</p>
-            } @else {
             <div class="reviews-list">
                 @for (review of reviews(); track review.id) {
                 <div class="review-item">
                     <div class="review-header">
                         <span class="review-user">{{ review.username }}</span>
                         <div class="stars static">
-                            @for (i of [1,2,3,4,5]; track i) {
-                            <span class="star" [class.filled]="i <= review.rating">★</span>
-                            }
+                            @for (i of [1,2,3,4,5]; track i) { <span class="star"
+                                [class.filled]="i <= review.rating">★</span> }
                         </div>
-                        @if (currentUser === review.username || isAdmin) {
-                        <button class="delete-review-btn" (click)="deleteReview(review.id)">🗑</button>
-                        }
+                        @if (currentUser === review.username || isAdmin) { <button class="delete-review-btn"
+                            (click)="deleteReview(review.id)">🗑</button> }
                     </div>
                     <p class="review-comment">{{ review.comment }}</p>
-                    <p class="review-date">{{ review.date | date:'shortDate' }}</p>
                 </div>
                 }
             </div>
-            }
-
             @if (currentUser) {
             <div class="review-form">
-                <h4>DEJAR UNA OPINIÓN</h4>
+                <h4>ESCRIBIR RESEÑA</h4>
                 <div class="star-input">
-                    @for (i of [1,2,3,4,5]; track i) {
-                    <span class="star interactive" [class.filled]="i <= (hoverRating || rating)"
-                        (mouseenter)="hoverRating = i" (mouseleave)="hoverRating = 0" (click)="rating = i">★</span>
-                    }
+                    @for (i of [1,2,3,4,5]; track i) { <span class="star interactive"
+                        [class.filled]="i <= (hoverRating || rating)" (mouseenter)="hoverRating=i"
+                        (mouseleave)="hoverRating=0" (click)="rating=i">★</span> }
                 </div>
-                <textarea [(ngModel)]="comment" placeholder="Escribe tu opinión..."></textarea>
+                <textarea [(ngModel)]="comment"></textarea>
                 <button (click)="submitReview()">PUBLICAR</button>
             </div>
-            } @else {
-            <div class="login-prompt">
-                <p>Debes iniciar sesión para dejar una reseña.</p>
-            </div>
             }
-
         </div>
     </div>
 </div>

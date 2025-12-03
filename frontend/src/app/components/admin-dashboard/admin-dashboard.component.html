@@ -1,16 +1,14 @@
 <section class="admin-page">
-    <div class="admin-header">
-        <h1>ADMIN DASHBOARD</h1>
-        <div class="header-actions" style="display: flex; gap: 10px;">
-            <button class="reset-db-btn" (click)="handleResetDB()"
-                style="background: #dc2626; color: white; border: none; padding: 5px 10px; cursor: pointer; font-size: 10px;">
-                ⚠️ RESETEAR DB
-            </button>
-            <button class="close-btn" (click)="close.emit()">✕</button>
-        </div>
-    </div>
-
     <div class="admin-wrapper">
+
+        <div class="admin-header">
+            <h1>ADMIN DASHBOARD</h1>
+            <div class="header-actions">
+                <button class="reset-db-btn" (click)="handleResetDB()">⚠️ RESETEAR DB</button>
+                <button class="close-btn" (click)="close.emit()">SALIR</button>
+            </div>
+        </div>
+
         <div class="admin-tabs">
             <button class="tab-button" [class.active]="activeTab === 'productos'"
                 (click)="setTab('productos')">PRODUCTOS</button>
@@ -20,6 +18,7 @@
 
         @if (activeTab === 'productos') {
         <div class="products-layout">
+
             <div class="form-section">
                 @if (isEditing) {
                 <h2 class="form-title">{{ editingProduct?.id ? 'EDITAR' : 'NUEVO' }}</h2>
@@ -35,62 +34,87 @@
                             </option> }
                         </select>
                     </div>
-
-                    <div class="price-discount-row" style="display: flex; gap: 15px;">
-                        <div class="form-group" style="flex: 1;"><label>PRECIO</label><input type="number"
-                                [(ngModel)]="formData().price" name="price" min="0" required></div>
-                        <div class="form-group" style="flex: 1;"><label>DESCUENTO (%)</label><input type="number"
-                                [(ngModel)]="formData().discount" name="discount" min="0" max="100"></div>
+                    <div class="price-discount-row">
+                        <div class="form-group"><label>PRECIO</label><input type="number" [(ngModel)]="formData().price"
+                                name="price" required></div>
+                        <div class="form-group"><label>DESCUENTO (%)</label><input type="number"
+                                [(ngModel)]="formData().discount" name="discount"></div>
                     </div>
 
-                    <h3 class="size-header">TALLES Y STOCK</h3>
-                    <div class="size-list">
-                        @for (sizeEntry of formData().sizes ?? []; track $index) {
-                        <div class="size-item">
-                            <select [(ngModel)]="formData().sizes![$index].size" name="s{{$index}}" required>
-                                @for (s of sizesOptions; track s) { <option [value]="s">{{ s }}</option> }
-                            </select>
-                            <input type="number" [(ngModel)]="formData().sizes![$index].stock" name="st{{$index}}"
-                                placeholder="Stock">
-                            <button type="button" class="remove-btn" (click)="handleRemoveSize($index)">X</button>
+                    <div class="form-group">
+                        <div class="size-header">
+                            <span>TALLES Y STOCK</span>
+                            <button type="button" class="add-size-btn" (click)="handleAddSize()">+ AGREGAR</button>
                         </div>
+                        <div class="size-list">
+                            @for (sizeEntry of formData().sizes ?? []; track $index) {
+                            <div class="size-item">
+                                <select [(ngModel)]="formData().sizes![$index].size" name="s{{$index}}" required>
+                                    @for (s of sizesOptions; track s) { <option [value]="s">{{ s }}</option> }
+                                </select>
+                                <input type="number" [(ngModel)]="formData().sizes![$index].stock" name="st{{$index}}"
+                                    placeholder="Stock">
+                                <button type="button" class="remove-btn" (click)="handleRemoveSize($index)">✕</button>
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>IMAGEN PRINCIPAL</label>
+                        @if (mainImagePreview()) {
+                        <div class="image-preview-container">
+                            <img [src]="mainImagePreview()!" class="image-preview">
+                            <button type="button" class="change-img-btn"
+                                onclick="document.getElementById('mainImageInput').click()">CAMBIAR IMAGEN</button>
+                        </div>
+                        } @else {
+                        <label class="image-upload-wrapper">
+                            <span class="upload-icon">⭳</span>
+                            <span class="upload-text">HAZ CLIC PARA SUBIR</span>
+                            <input type="file" id="mainImageInput" style="display: none;"
+                                (change)="handleImageUpload($event, 'mainImage')" accept="image/*">
+                        </label>
                         }
-                        <button type="button" class="add-size-btn" (click)="handleAddSize()">+ TALLE</button>
                     </div>
 
-                    <div class="form-group image-upload-wrapper">
-                        <label>IMAGEN</label>
-                        <input type="file" (change)="handleImageUpload($event, 'mainImage')">
-                        @if(mainImagePreview()) { <img [src]="mainImagePreview()"
-                            style="max-height:100px; margin-top:10px;"> }
-                    </div>
-
-                    <div class="form-actions" style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button type="submit" style="background:black; color:white; padding:10px;">GUARDAR</button>
-                        <button type="button" (click)="cancelEdit()"
-                            style="border:1px solid #ccc; padding:10px;">CANCELAR</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">GUARDAR</button>
+                        <button type="button" class="btn-secondary" (click)="cancelEdit()">CANCELAR</button>
                     </div>
                 </form>
                 } @else {
-                <div style="text-align:center; padding-top:50px;">
-                    <button (click)="newProduct()" class="upload-button" style="border:2px solid black;">+ NUEVO
-                        PRODUCTO</button>
+                <div class="form-initial-state">
+                    <p>Selecciona un producto para editar</p>
+                    <button (click)="newProduct()" class="btn-secondary" style="margin-top:10px;">+ CREAR NUEVO</button>
                 </div>
                 }
             </div>
 
             <div class="list-section">
-                <h2>LISTA ({{ products.length }})</h2>
+                <div class="list-header">
+                    <h2>LISTADO ({{ filteredProducts.length }})</h2>
+                    <select class="admin-select" [(ngModel)]="categoryFilter"
+                        (change)="onCategoryChange(categoryFilter)">
+                        <option value="todos">TODOS</option>
+                        @for (cat of categoriesOptions; track cat) { <option [value]="cat">{{ cat.toUpperCase() }}
+                        </option> }
+                    </select>
+                </div>
                 <div class="product-list">
                     @for (product of filteredProducts; track product.id) {
                     <div class="product-card-admin">
+                        <div class="product-image-thumb">
+                            <img [src]="product.mainImage">
+                        </div>
                         <div class="product-details">
                             <h3>{{ product.name }}</h3>
-                            <p>${{ product.price }} ({{ product.discount ?? 0 }}% OFF)</p>
+                            <p>{{ getCategoryLabel(product.category) }} | ${{ product.price }}</p>
+                            <p style="font-size:10px; color:#888;">{{ getSizesLabel(product) }}</p>
                         </div>
                         <div class="admin-actions">
-                            <button (click)="handleEdit(product)">EDITAR</button>
-                            <button (click)="handleDelete(product.id)" style="color: red;">ELIMINAR</button>
+                            <button class="action-btn" (click)="handleEdit(product)">EDITAR</button>
+                            <button class="action-btn delete" (click)="handleDelete(product.id)">BORRAR</button>
                         </div>
                     </div>
                     }
@@ -102,16 +126,40 @@
         @if (activeTab === 'banners') {
         <div class="banner-section">
             <div class="banner-item">
-                <label>BANNER 1</label>
-                <input type="file" (change)="handleImageUpload($event, 'banner1')">
-                @if(banner1Preview()) { <img [src]="banner1Preview()" style="max-width:100%; max-height:200px;"> }
+                <span class="banner-label">BANNER PRINCIPAL</span>
+                @if (banner1Preview()) {
+                <div class="image-preview-container">
+                    <img [src]="banner1Preview()!" class="image-preview">
+                    <button class="change-img-btn" onclick="document.getElementById('b1').click()">CAMBIAR</button>
+                    <input id="b1" type="file" style="display:none" (change)="handleImageUpload($event, 'banner1')">
+                </div>
+                } @else {
+                <label class="image-upload-wrapper">
+                    <span class="upload-icon">⭳</span>
+                    <span>SUBIR BANNER 1</span>
+                    <input type="file" style="display:none" (change)="handleImageUpload($event, 'banner1')">
+                </label>
+                }
             </div>
+
             <div class="banner-item">
-                <label>BANNER 2</label>
-                <input type="file" (change)="handleImageUpload($event, 'banner2')">
-                @if(banner2Preview()) { <img [src]="banner2Preview()" style="max-width:100%; max-height:200px;"> }
+                <span class="banner-label">BANNER SECUNDARIO</span>
+                @if (banner2Preview()) {
+                <div class="image-preview-container">
+                    <img [src]="banner2Preview()!" class="image-preview">
+                    <button class="change-img-btn" onclick="document.getElementById('b2').click()">CAMBIAR</button>
+                    <input id="b2" type="file" style="display:none" (change)="handleImageUpload($event, 'banner2')">
+                </div>
+                } @else {
+                <label class="image-upload-wrapper">
+                    <span class="upload-icon">⭳</span>
+                    <span>SUBIR BANNER 2</span>
+                    <input type="file" style="display:none" (change)="handleImageUpload($event, 'banner2')">
+                </label>
+                }
             </div>
-            <button class="save-banners-btn" (click)="handleSaveBanners()">GUARDAR BANNERS</button>
+
+            <button class="btn-primary" (click)="handleSaveBanners()">GUARDAR CAMBIOS</button>
         </div>
         }
     </div>

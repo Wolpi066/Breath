@@ -22,7 +22,7 @@
     margin: 0;
 }
 
-/* --- CONTENEDOR (Full Bleed) --- */
+/* --- CONTENEDOR (Full Bleed / Sin Márgenes) --- */
 .grid-wrapper {
     width: 100%;
     padding: 0;
@@ -38,11 +38,10 @@
     /* Mobile: 2 Columnas */
     grid-template-columns: repeat(2, 1fr);
 
-    /* Espaciado: 48px vertical, 12px horizontal */
+    /* Espaciado */
     gap: 48px 12px;
 
     margin-bottom: 64px;
-    /* Espacio antes del siguiente banner */
 }
 
 /* Desktop: 4 Columnas Exactas */

@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { MinimalProductGridComponent } from './components/minimal-product-grid/minimal-product-grid.component';
-// ✅ MANTENIDO PLURAL
+// ✅ CORREGIDO: Importa desde el archivo con 's' al final
 import { ProductsPageComponent } from './components/products-page/products-page.components';
 import { MinimalFooterComponent } from './components/minimal-footer/minimal-footer.component';
 import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.component';
@@ -28,7 +28,7 @@ const banner2Img = 'assets/CARDS/wmremove-transformed.png';
     MinimalNavbarComponent,
     HeroComponent,
     MinimalProductGridComponent,
-    ProductsPageComponent,
+    ProductsPageComponent, // Angular ahora encontrará el archivo correcto
     MinimalFooterComponent,
     ShoppingCartComponent,
     AdminDashboardComponent,
@@ -48,14 +48,17 @@ export class AppComponent implements OnInit {
   cart = signal<{ id: string; name: string; price: number; quantity: number; image: string; size?: string }[]>([]);
   cartItemsCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
 
+  // UI
   isCartOpen = signal(false);
   isAuthOpen = signal(false);
   selectedProduct = signal<Product | null>(null);
   globalSearchTerm = signal('');
 
+  // Datos
   adminProducts = signal<Product[]>([]);
   banners = signal<BannerData>({ banner1: banner1Img, banner2: banner2Img });
 
+  // Auth
   currentUser = this.authService.currentUser;
 
   get isAdmin(): boolean {
@@ -85,7 +88,9 @@ export class AppComponent implements OnInit {
 
   handleSearch(term: string) {
     this.globalSearchTerm.set(term);
-    if (term) this.navigate('productos');
+    if (term) {
+      this.navigate('productos');
+    }
   }
 
   navigate(page: 'home' | 'productos' | 'contacto' | 'about' | 'admin') {
@@ -94,6 +99,7 @@ export class AppComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // UI HELPERS
   openCart() { this.isCartOpen.set(true); }
   closeCart() { this.isCartOpen.set(false); }
   openAuth() { this.isAuthOpen.set(true); }
@@ -104,6 +110,7 @@ export class AppComponent implements OnInit {
     if (p) this.selectedProduct.set(p);
   }
 
+  // AUTH
   handleLogin(data: { user: string, pass: string }) {
     this.authService.login(data.user, data.pass).subscribe({
       next: () => this.closeAuth(),
@@ -124,6 +131,7 @@ export class AppComponent implements OnInit {
     this.navigate('home');
   }
 
+  // CARRITO
   addToCart(productId: string) {
     const product = this.adminProducts().find((p) => p.id === productId);
     if (!product) return;
@@ -146,7 +154,10 @@ export class AppComponent implements OnInit {
     if (existing) {
       this.cart.update(prev => prev.map(i => i.id === cartItemId ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      this.cart.update(prev => [...prev, { id: cartItemId, name: product.name, price: finalPrice, quantity: 1, image: product.mainImage, size: size }]);
+      this.cart.update(prev => [...prev, {
+        id: cartItemId, name: product.name, price: finalPrice,
+        quantity: 1, image: product.mainImage, size: size
+      }]);
     }
   }
 
@@ -158,6 +169,7 @@ export class AppComponent implements OnInit {
     this.cart.update((prev) => prev.filter((i) => i.id !== id));
   }
 
+  // ADMIN
   saveProduct(product: Product) {
     if (product.id && this.adminProducts().some(p => p.id === product.id)) {
       this.productService.updateProduct(product).subscribe(() => {

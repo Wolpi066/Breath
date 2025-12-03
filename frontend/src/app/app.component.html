@@ -1,6 +1,7 @@
 @if (selectedProduct()) {
 <app-product-detail [product]="selectedProduct()!" [currentUser]="currentUser()" (close)="selectedProduct.set(null)"
     (addToCart)="addToCartWithSize($event)" (openCart)="openCart()"></app-product-detail>
+
 } @else {
 <div class="min-h-screen bg-black">
 
@@ -16,15 +17,18 @@
         <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()"
             (addToCart)="addToCart($event)" (cardClick)="openProductDetail($event)">
         </app-minimal-product-grid>
+
         } @else if (currentPage() === 'productos') {
         <app-products-page [adminProducts]="adminProducts()" [searchQuery]="globalSearchTerm()"
             (addToCart)="addToCart($event)">
         </app-products-page>
+
         } @else if (currentPage() === 'admin') {
         <app-admin-dashboard [products]="adminProducts()" [banners]="banners()" (close)="navigate('home')"
             (saveProduct)="saveProduct($event)" (deleteProduct)="deleteProduct($event)"
             (saveBanners)="saveBanners($event)">
         </app-admin-dashboard>
+
         } @else {
         <div style="padding-top: 150px; text-align: center; height: 60vh;">
             <h1>PÁGINA EN CONSTRUCCIÓN</h1>

@@ -1,42 +1,26 @@
 <section class="page-container">
-
     <div class="content-wrapper">
 
         <div class="mobile-controls">
             <span class="results-count">{{ filteredProducts().length }} PRODUCTOS</span>
             <button class="filter-toggle-btn" (click)="isFilterOpen.set(true)">
-                FILTRAR
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="4" y1="21" x2="4" y2="14"></line>
-                    <line x1="4" y1="10" x2="4" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12" y2="3"></line>
-                    <line x1="20" y1="21" x2="20" y2="16"></line>
-                    <line x1="20" y1="12" x2="20" y2="3"></line>
-                    <line x1="1" y1="14" x2="7" y2="14"></line>
-                    <line x1="9" y1="8" x2="15" y2="8"></line>
-                    <line x1="17" y1="16" x2="23" y2="16"></line>
-                </svg>
+                FILTRAR <span style="font-size: 10px;">▼</span>
             </button>
         </div>
 
         <aside class="sidebar" [class.open]="isFilterOpen()">
-
             <div class="sidebar-header-mobile">
                 <h3>FILTROS</h3>
                 <button class="close-sidebar-btn" (click)="isFilterOpen.set(false)">✕</button>
             </div>
 
             <div class="sidebar-content">
-
                 <div class="filter-group">
                     <h3 class="filter-title">CATEGORÍA</h3>
                     <div class="filter-list">
                         @for (cat of categories; track cat.id) {
                         <button class="category-btn" [class.active]="selectedCategories().includes(cat.id)"
-                            (click)="toggleCategory(cat.id)">
-                            {{ cat.label }}
-                        </button>
+                            (click)="toggleCategory(cat.id)">{{ cat.label }}</button>
                         }
                     </div>
                 </div>
@@ -48,8 +32,7 @@
                         <label class="checkbox-item">
                             <input type="checkbox" [checked]="selectedSizes().includes(size)"
                                 (change)="toggleSize(size)">
-                            <span class="checkmark"></span>
-                            <span class="label-text">{{ size }}</span>
+                            <span class="checkmark"></span><span class="label-text">{{ size }}</span>
                         </label>
                         }
                     </div>
@@ -58,40 +41,25 @@
                 <div class="filter-group">
                     <h3 class="filter-title">PRECIO</h3>
                     <div class="price-row">
-                        <div class="price-input">
-                            <label>DESDE</label>
-                            <input type="number" [(ngModel)]="priceFrom" placeholder="$0">
-                        </div>
-                        <div class="price-input">
-                            <label>HASTA</label>
-                            <input type="number" [(ngModel)]="priceTo" placeholder="Sin límite">
-                        </div>
+                        <div class="price-input"><label>DESDE</label><input type="number" [(ngModel)]="priceFrom"
+                                placeholder="$0"></div>
+                        <div class="price-input"><label>HASTA</label><input type="number" [(ngModel)]="priceTo"
+                                placeholder="Sin límite"></div>
                     </div>
                 </div>
 
                 @if (selectedCategories().length > 0 || selectedSizes().length > 0 || priceFrom() || priceTo()) {
-                <button class="clear-btn" (click)="clearFilters()">
-                    LIMPIAR FILTROS
-                </button>
+                <button class="clear-btn" (click)="clearFilters()">LIMPIAR FILTROS</button>
                 }
-
             </div>
-
-            <div class="sidebar-footer-mobile">
-                <button class="apply-btn" (click)="isFilterOpen.set(false)">
-                    VER RESULTADOS
-                </button>
-            </div>
+            <div class="sidebar-footer-mobile"><button class="apply-btn" (click)="isFilterOpen.set(false)">VER
+                    RESULTADOS</button></div>
         </aside>
 
-        @if (isFilterOpen()) {
-        <div class="sidebar-overlay" (click)="isFilterOpen.set(false)"></div>
-        }
+        @if (isFilterOpen()) { <div class="sidebar-overlay" (click)="isFilterOpen.set(false)"></div> }
 
         <main class="grid-area">
-
-            <div class="desktop-header">
-                <span class="results-count">{{ filteredProducts().length }} PRODUCTOS</span>
+            <div class="desktop-header"><span class="results-count">{{ filteredProducts().length }} PRODUCTOS</span>
             </div>
 
             @if (filteredProducts().length > 0) {
@@ -99,18 +67,15 @@
                 @for (product of filteredProducts(); track product.id) {
                 <app-minimal-product-card [id]="product.id" [name]="product.name" [price]="product.price"
                     [originalPrice]="product.originalPrice" [image]="product.mainImage"
-                    [salePercentage]="product.discount"
-                    (addToCart)="onCardAddToCart($event)"></app-minimal-product-card>
+                    [salePercentage]="product.discount" (addToCart)="onCardAddToCart($event)"
+                    (cardClick)="onCardAddToCart($event)"></app-minimal-product-card>
                 }
             </div>
             } @else {
             <div class="empty-results">
-                <p>NO SE ENCONTRARON PRODUCTOS</p>
-                <button (click)="clearFilters()">Limpiar Filtros</button>
+                <p>NO SE ENCONTRARON PRODUCTOS</p><button (click)="clearFilters()">Limpiar</button>
             </div>
             }
-
         </main>
-
     </div>
 </section>
