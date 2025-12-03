@@ -17,12 +17,12 @@ export class ProductDetailComponent implements OnChanges {
     @Input() currentUser: string | null = null;
 
     @Output() close = new EventEmitter<void>();
-    // ✅ CAMBIO: Ahora emitimos cantidad también
+    // ✅ EMITIMOS CANTIDAD
     @Output() addToCart = new EventEmitter<{ id: string, size: string, quantity: number }>();
     @Output() openCart = new EventEmitter<void>();
 
     selectedSize = signal<string | null>(null);
-    quantity = signal(1); // ✅ NUEVO: Cantidad seleccionada
+    quantity = signal(1); // ✅ NUEVO: Estado de cantidad
     reviews = signal<Review[]>([]);
 
     rating = 0; hoverRating = 0; comment = '';
@@ -32,12 +32,12 @@ export class ProductDetailComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes['product'] && this.product) {
             this.selectedSize.set(null);
-            this.quantity.set(1); // Reset cantidad
+            this.quantity.set(1); // Reset al cambiar producto
             this.loadReviews();
         }
     }
 
-    // ✅ NUEVO: Control de cantidad
+    // ✅ MÉTODOS PARA CANTIDAD
     incrementQty() { this.quantity.update(q => q + 1); }
     decrementQty() { this.quantity.update(q => (q > 1 ? q - 1 : 1)); }
 
@@ -48,6 +48,7 @@ export class ProductDetailComponent implements OnChanges {
     onAddToCartClick() {
         if (!this.selectedSize()) { alert('Por favor selecciona un talle'); return; }
 
+        // ✅ EMITIMOS CON CANTIDAD
         this.addToCart.emit({
             id: this.product.id,
             size: this.selectedSize()!,
@@ -56,16 +57,16 @@ export class ProductDetailComponent implements OnChanges {
         this.openCart.emit();
     }
 
-    // ... (Resto de funciones: loadReviews, submitReview, deleteReview igual) ...
+    // ... (Resto de lógica de reseñas igual) ...
     loadReviews() {
         const key = `breath-reviews-${this.product.id}`;
         const saved = localStorage.getItem(key);
         this.reviews.set(saved ? JSON.parse(saved) : []);
     }
     submitReview() {
-        if (!this.currentUser) return alert('Inicia sesión');
-        if (this.rating === 0) return alert('Califica');
-        if (!this.comment.trim()) return alert('Escribe');
+        if (!this.currentUser) return alert('Inicia sesión para opinar');
+        if (this.rating === 0) return alert('Selecciona una calificación');
+        if (!this.comment.trim()) return alert('Escribe un comentario');
         const newReview: Review = { id: Date.now().toString(), username: this.currentUser, rating: this.rating, comment: this.comment, date: new Date().toISOString() };
         const updated = [newReview, ...this.reviews()];
         this.reviews.set(updated);

@@ -138,10 +138,25 @@ export class AppComponent implements OnInit {
     this.addItemToCart(product, 'Única');
   }
 
-  addToCartWithSize(data: { id: string, size: string }) {
+  // ✅ AHORA USA LA CANTIDAD SELECCIONADA
+  addToCartWithSize(data: { id: string, size: string, quantity: number }) {
     const product = this.adminProducts().find((p) => p.id === data.id);
     if (!product) return;
-    this.addItemToCart(product, data.size);
+
+    const finalPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price;
+    const cartItemId = `${product.id}-${data.size}`;
+
+    const existing = this.cart().find((i) => i.id === cartItemId);
+    if (existing) {
+      this.cart.update(prev => prev.map(i => i.id === cartItemId ? { ...i, quantity: i.quantity + data.quantity } : i));
+    } else {
+      this.cart.update(prev => [...prev, {
+        id: cartItemId, name: product.name, price: finalPrice,
+        quantity: data.quantity, // USAMOS LA CANTIDAD DEL SELECTOR
+        image: product.mainImage, size: data.size
+      }]);
+    }
+
     this.selectedProduct.set(null);
     this.openCart();
   }

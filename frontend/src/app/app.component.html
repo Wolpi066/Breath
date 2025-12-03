@@ -20,7 +20,7 @@
 
         } @else if (currentPage() === 'productos') {
         <app-products-page [adminProducts]="adminProducts()" [searchQuery]="globalSearchTerm()"
-            (addToCart)="addToCart($event)">
+            (productClick)="openProductDetail($event)">
         </app-products-page>
 
         } @else if (currentPage() === 'admin') {

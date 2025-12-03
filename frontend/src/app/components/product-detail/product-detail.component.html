@@ -7,12 +7,11 @@
 
     <div class="detail-container">
         <div class="detail-grid">
-            <div class="image-section"><img [src]="product.mainImage"></div>
+            <div class="image-section"><img [src]="product.mainImage" [alt]="product.name"></div>
 
             <div class="info-section">
                 <h1 class="product-title">{{ product.name }}</h1>
                 <p class="product-cat">{{ product.category }}</p>
-
                 <div class="product-price">
                     @if (product.discount) {
                     <span class="current-price">${{ product.price | number:'1.0-0' }}</span>
@@ -32,16 +31,17 @@
                 @if (selectedSize()) { <p class="stock-info">Stock: {{ getStock(selectedSize()!) }}</p> }
 
                 <div class="actions-row" style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <div class="qty-selector" style="display: flex; border: 1px solid #ccc; align-items: center;">
+                    <div class="qty-control"
+                        style="display: flex; border: 1px solid #ccc; height: 48px; align-items: center;">
                         <button (click)="decrementQty()"
-                            style="padding: 10px 15px; background: none; border: none; cursor: pointer;">-</button>
-                        <span style="padding: 0 10px; font-size: 12px;">{{ quantity() }}</span>
+                            style="width: 40px; height: 100%; border: none; background: none; cursor: pointer; font-size: 16px;">-</button>
+                        <span style="min-width: 30px; text-align: center; font-size: 14px;">{{ quantity() }}</span>
                         <button (click)="incrementQty()"
-                            style="padding: 10px 15px; background: none; border: none; cursor: pointer;">+</button>
+                            style="width: 40px; height: 100%; border: none; background: none; cursor: pointer; font-size: 16px;">+</button>
                     </div>
 
                     <button class="add-btn" [disabled]="!selectedSize()" (click)="onAddToCartClick()"
-                        style="flex: 1; margin-bottom: 0;">
+                        style="flex: 1; margin-bottom: 0; height: 48px;">
                         AGREGAR AL CARRITO
                     </button>
                 </div>
@@ -66,10 +66,8 @@
                 <div class="review-item">
                     <div class="review-header">
                         <span class="review-user">{{ review.username }}</span>
-                        <div class="stars static">
-                            @for (i of [1,2,3,4,5]; track i) { <span class="star"
-                                [class.filled]="i <= review.rating">★</span> }
-                        </div>
+                        <div class="stars static">@for (i of [1,2,3,4,5]; track i) { <span class="star"
+                                [class.filled]="i <= review.rating">★</span> }</div>
                         @if (currentUser === review.username || isAdmin) { <button class="delete-review-btn"
                             (click)="deleteReview(review.id)">🗑</button> }
                     </div>
@@ -80,11 +78,9 @@
             @if (currentUser) {
             <div class="review-form">
                 <h4>ESCRIBIR RESEÑA</h4>
-                <div class="star-input">
-                    @for (i of [1,2,3,4,5]; track i) { <span class="star interactive"
+                <div class="star-input">@for (i of [1,2,3,4,5]; track i) { <span class="star interactive"
                         [class.filled]="i <= (hoverRating || rating)" (mouseenter)="hoverRating=i"
-                        (mouseleave)="hoverRating=0" (click)="rating=i">★</span> }
-                </div>
+                        (mouseleave)="hoverRating=0" (click)="rating=i">★</span> }</div>
                 <textarea [(ngModel)]="comment"></textarea>
                 <button (click)="submitReview()">PUBLICAR</button>
             </div>

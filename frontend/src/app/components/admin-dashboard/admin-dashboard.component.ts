@@ -109,7 +109,7 @@ export class AdminDashboardComponent implements OnChanges {
 
     handleAddSize() { this.formData.update(d => ({ ...d, sizes: [...(d.sizes || []), { size: 'M', stock: 0 } as ProductSize] })); }
     handleRemoveSize(index: number) { this.formData.update(d => ({ ...d, sizes: d.sizes?.filter((_, i) => i !== index) })); }
-    handleUpdateSize(index: number, field: 'size' | 'stock', event: Event) { /* Lógica existente si la usas */ }
+    handleUpdateSize(index: number, field: 'size' | 'stock', event: Event) { /* ... */ }
 
     handleSubmit(e: Event) {
         e.preventDefault();
@@ -117,8 +117,7 @@ export class AdminDashboardComponent implements OnChanges {
         if (!data.name || data.price === undefined || !this.mainImagePreview()) { alert("Faltan campos requeridos."); return; }
 
         const finalProduct: Product = {
-            ...this.editingProduct,
-            ...data,
+            ...this.editingProduct, ...data,
             id: this.editingProduct?.id || '',
             hoverImage: data.hoverImage || data.mainImage || '',
             description: data.description || '',
@@ -129,12 +128,17 @@ export class AdminDashboardComponent implements OnChanges {
     }
 
     handleDelete(id: string) { if (confirm('¿Eliminar?')) this.deleteProduct.emit(id); }
+
     handleSaveBanners() {
-        const newBanners: BannerData = { banner1: this.banner1Preview() || '', banner2: this.banner2Preview() || '' };
+        const newBanners: BannerData = {
+            banner1: this.banner1Preview() || '',
+            banner2: this.banner2Preview() || '',
+        };
         this.saveBanners.emit(newBanners);
         alert('Banners guardados');
         this.close.emit();
     }
+
     handleResetDB() {
         if (confirm("¿RESET DB?")) {
             this.productService.resetDatabase().subscribe({ next: (res) => { alert(res.message); window.location.reload(); }, error: (err) => alert('Error: ' + err.error?.error) });

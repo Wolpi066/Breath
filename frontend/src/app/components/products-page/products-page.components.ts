@@ -6,9 +6,8 @@ import { Product } from '../../models/product.model';
 
 @Component({
     selector: 'app-products-page',
-    standalone: true, // ✅ CRÍTICO: Esto soluciona el error TS-992012
+    standalone: true,
     imports: [CommonModule, FormsModule, MinimalProductCardComponent],
-    // Asegúrate de que estos archivos existan con estos nombres exactos
     templateUrl: './products-page.components.html',
     styleUrls: ['./products-page.components.css']
 })
@@ -25,7 +24,8 @@ export class ProductsPageComponent {
         this._searchSignal.set(value);
     }
 
-    @Output() addToCart = new EventEmitter<string>();
+    // Este Output se usará para abrir el detalle
+    @Output() productClick = new EventEmitter<string>();
 
     selectedCategories = signal<string[]>([]);
     selectedSizes = signal<string[]>([]);
@@ -61,5 +61,9 @@ export class ProductsPageComponent {
         this.priceFrom.set(null);
         this.priceTo.set(null);
     }
-    onCardAddToCart(id: string) { this.addToCart.emit(id); }
+
+    // Emitimos el ID para que el padre abra el detalle
+    onCardClick(id: string) {
+        this.productClick.emit(id);
+    }
 }

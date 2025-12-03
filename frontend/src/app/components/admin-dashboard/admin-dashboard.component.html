@@ -5,7 +5,7 @@
             <h1>ADMIN DASHBOARD</h1>
             <div class="header-actions">
                 <button class="reset-db-btn" (click)="handleResetDB()">⚠️ RESETEAR DB</button>
-                <button class="close-btn" (click)="close.emit()">SALIR</button>
+                <button class="close-btn" (click)="close.emit()">SALIR AL HOME</button>
             </div>
         </div>
 
@@ -21,9 +21,9 @@
 
             <div class="form-section">
                 @if (isEditing) {
-                <h2 class="form-title">{{ editingProduct?.id ? 'EDITAR' : 'NUEVO' }}</h2>
-                <form (ngSubmit)="handleSubmit($event)">
+                <h2 class="form-title">{{ editingProduct?.id ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}</h2>
 
+                <form (ngSubmit)="handleSubmit($event)">
                     <div class="form-group"><label>NOMBRE</label><input type="text" [(ngModel)]="formData().name"
                             name="name" required></div>
                     <div class="form-group"><label>DESCRIPCIÓN</label><textarea [(ngModel)]="formData().description"
@@ -34,9 +34,10 @@
                             </option> }
                         </select>
                     </div>
+
                     <div class="price-discount-row">
-                        <div class="form-group"><label>PRECIO</label><input type="number" [(ngModel)]="formData().price"
-                                name="price" required></div>
+                        <div class="form-group"><label>PRECIO ($)</label><input type="number"
+                                [(ngModel)]="formData().price" name="price" required></div>
                         <div class="form-group"><label>DESCUENTO (%)</label><input type="number"
                                 [(ngModel)]="formData().discount" name="discount"></div>
                     </div>
@@ -50,7 +51,7 @@
                             @for (sizeEntry of formData().sizes ?? []; track $index) {
                             <div class="size-item">
                                 <select [(ngModel)]="formData().sizes![$index].size" name="s{{$index}}" required>
-                                    @for (s of sizesOptions; track s) { <option [value]="s">{{ s }}</option> }
+                                    @for (s of sizesOptions; track s) { <option [value]="s">{{s}}</option> }
                                 </select>
                                 <input type="number" [(ngModel)]="formData().sizes![$index].stock" name="st{{$index}}"
                                     placeholder="Stock">
@@ -76,41 +77,44 @@
                                 (change)="handleImageUpload($event, 'mainImage')" accept="image/*">
                         </label>
                         }
+                        <input type="file" id="mainImageInput" style="display: none;"
+                            (change)="handleImageUpload($event, 'mainImage')" accept="image/*">
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">GUARDAR</button>
+                        <button type="submit" class="btn-primary">{{ editingProduct ? 'ACTUALIZAR' : 'GUARDAR'
+                            }}</button>
                         <button type="button" class="btn-secondary" (click)="cancelEdit()">CANCELAR</button>
                     </div>
                 </form>
                 } @else {
                 <div class="form-initial-state">
-                    <p>Selecciona un producto para editar</p>
-                    <button (click)="newProduct()" class="btn-secondary" style="margin-top:10px;">+ CREAR NUEVO</button>
+                    <p>Selecciona un producto de la lista para editarlo</p>
+                    <button (click)="newProduct()" class="btn-secondary" style="margin-top:16px; border-width:2px;">+
+                        CREAR NUEVO PRODUCTO</button>
                 </div>
                 }
             </div>
 
             <div class="list-section">
                 <div class="list-header">
-                    <h2>LISTADO ({{ filteredProducts.length }})</h2>
+                    <h2>INVENTARIO ({{ filteredProducts.length }})</h2>
                     <select class="admin-select" [(ngModel)]="categoryFilter"
                         (change)="onCategoryChange(categoryFilter)">
-                        <option value="todos">TODOS</option>
+                        <option value="todos">TODAS LAS CATEGORÍAS</option>
                         @for (cat of categoriesOptions; track cat) { <option [value]="cat">{{ cat.toUpperCase() }}
                         </option> }
                     </select>
                 </div>
+
                 <div class="product-list">
                     @for (product of filteredProducts; track product.id) {
                     <div class="product-card-admin">
-                        <div class="product-image-thumb">
-                            <img [src]="product.mainImage">
-                        </div>
+                        <div class="product-image-thumb"><img [src]="product.mainImage"></div>
                         <div class="product-details">
                             <h3>{{ product.name }}</h3>
                             <p>{{ getCategoryLabel(product.category) }} | ${{ product.price }}</p>
-                            <p style="font-size:10px; color:#888;">{{ getSizesLabel(product) }}</p>
+                            <p style="font-size:11px; color:#888;">{{ getSizesLabel(product) }}</p>
                         </div>
                         <div class="admin-actions">
                             <button class="action-btn" (click)="handleEdit(product)">EDITAR</button>
@@ -126,11 +130,12 @@
         @if (activeTab === 'banners') {
         <div class="banner-section">
             <div class="banner-item">
-                <span class="banner-label">BANNER PRINCIPAL</span>
+                <span class="banner-label">BANNER PRINCIPAL (TOP)</span>
                 @if (banner1Preview()) {
                 <div class="image-preview-container">
                     <img [src]="banner1Preview()!" class="image-preview">
-                    <button class="change-img-btn" onclick="document.getElementById('b1').click()">CAMBIAR</button>
+                    <button class="change-img-btn" onclick="document.getElementById('b1').click()">CAMBIAR
+                        IMAGEN</button>
                     <input id="b1" type="file" style="display:none" (change)="handleImageUpload($event, 'banner1')">
                 </div>
                 } @else {
@@ -143,11 +148,12 @@
             </div>
 
             <div class="banner-item">
-                <span class="banner-label">BANNER SECUNDARIO</span>
+                <span class="banner-label">BANNER SECUNDARIO (BOTTOM)</span>
                 @if (banner2Preview()) {
                 <div class="image-preview-container">
                     <img [src]="banner2Preview()!" class="image-preview">
-                    <button class="change-img-btn" onclick="document.getElementById('b2').click()">CAMBIAR</button>
+                    <button class="change-img-btn" onclick="document.getElementById('b2').click()">CAMBIAR
+                        IMAGEN</button>
                     <input id="b2" type="file" style="display:none" (change)="handleImageUpload($event, 'banner2')">
                 </div>
                 } @else {
@@ -159,7 +165,7 @@
                 }
             </div>
 
-            <button class="btn-primary" (click)="handleSaveBanners()">GUARDAR CAMBIOS</button>
+            <button class="save-banners-btn" (click)="handleSaveBanners()">GUARDAR TODOS LOS BANNERS</button>
         </div>
         }
     </div>

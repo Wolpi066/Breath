@@ -27,12 +27,12 @@ class User
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitizar
+        // Sanitizar SOLO texto normal, NO la contraseña
         $this->username = htmlspecialchars(strip_tags($this->username));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->role = htmlspecialchars(strip_tags($this->role));
 
-        // Hashear password (NUNCA guardar texto plano)
+        // ⚠️ CORRECCIÓN: Hashear la contraseña CRUDA, sin modificarla antes
         $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
 
         // Bindear
@@ -47,7 +47,7 @@ class User
         return false;
     }
 
-    // --- BUSCAR POR EMAIL (Para el Login) ---
+    // --- BUSCAR POR EMAIL ---
     public function emailExists()
     {
         $query = "SELECT id, username, password, role
@@ -63,7 +63,6 @@ class User
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id = $row['id'];
             $this->username = $row['username'];
-            // Guardamos el hash de la DB para verificarlo luego
             $this->password = $row['password'];
             $this->role = $row['role'];
             return true;
@@ -71,7 +70,7 @@ class User
         return false;
     }
 
-    // --- BUSCAR POR USERNAME (Alternativa) ---
+    // --- BUSCAR POR USERNAME ---
     public function usernameExists()
     {
         $query = "SELECT id, username, email, password, role
