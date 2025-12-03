@@ -35,6 +35,14 @@ switch ($resource) {
         $controller->processRequest();
         break;
 
+    case 'reviews': // ✅ NUEVO ENDPOINT AGREGADO
+        require_once 'controllers/ReviewController.php';
+        $controller = new ReviewController($db, $requestMethod);
+        // Si hay ID en la URL (ej: /reviews/5), se pasa al controlador
+        $id = is_numeric($subResource) ? (int) $subResource : null;
+        $controller->processRequest($id);
+        break;
+
     case 'admin':
         require_once 'controllers/AdminController.php';
         $controller = new AdminController($db, $requestMethod);

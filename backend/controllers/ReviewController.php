@@ -1,104 +1,112 @@
 <?php
 require_once __DIR__ . '/AuthController.php';
+require_once __DIR__ . '/../models/Review.php';
 
 class ReviewController
 {
     private $db;
     private $requestMethod;
+    private $reviewModel;
 
     public function __construct($db, $requestMethod)
     {
         $this->db = $db;
         $this->requestMethod = $requestMethod;
+        $this->reviewModel = new Review($db);
     }
 
     public function processRequest($id = null)
     {
-        // Validar Token (Necesario para crear o borrar)
-        $auth = new AuthController($this->db, $this->requestMethod);
-        $user = $auth->validateToken();
+        // Envolver todo en try-catch para evitar errores HTML que rompan el JSON
+        try {
+            $auth = new AuthController($this->db, $this->requestMethod);
 
-        switch ($this->requestMethod) {
-            case 'POST':
-                if (!$user) {
-                    header("HTTP/1.1 401 Unauthorized");
-                    echo json_encode(["error" => "Debes iniciar sesión"]);
-                    return;
-                }
-                $input = json_decode(file_get_contents('php://input'), true);
-                $this->createReview($input, $user['id']);
-                break;
+            switch ($this->requestMethod) {
+                case 'GET':
+                    if (isset($_GET['product_id'])) {
+                        $this->getReviewsByProduct($_GET['product_id']);
+                    } else {
+                        $this->jsonResponse(["error" => "Falta product_id"], 400);
+                    }
+                    break;
 
-            case 'DELETE':
-                if (!$user || !$id) {
-                    header("HTTP/1.1 400 Bad Request");
-                    echo json_encode(["error" => "Faltan datos o permisos"]);
-                    return;
-                }
-                $this->deleteReview($id, $user);
-                break;
+                case 'POST':
+                    $user = $auth->validateToken(); // Esto devuelve un OBJETO (stdClass)
+                    if (!$user) {
+                        $this->jsonResponse(["error" => "Debes iniciar sesión"], 401);
+                        return;
+                    }
+                    $input = json_decode(file_get_contents('php://input'), true);
 
-            case 'GET':
-                // Obtener reseñas de un producto (público)
-                if (isset($_GET['product_id'])) {
-                    $this->getReviewsByProduct($_GET['product_id']);
-                }
-                break;
-        }
-    }
+                    // ⚠️ CORRECCIÓN AQUÍ: Usar ->id en lugar de ['id']
+                    $this->createReview($input, $user->id);
+                    break;
 
-    private function createReview($data, $userId)
-    {
-        // ... lógica de insert ...
-        $query = "INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (:uid, :pid, :rating, :comment)";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([
-            ':uid' => $userId,
-            ':pid' => $data['product_id'],
-            ':rating' => $data['rating'],
-            ':comment' => $data['comment']
-        ]);
-        echo json_encode(["message" => "Reseña creada"]);
-    }
+                case 'DELETE':
+                    $user = $auth->validateToken(); // Esto devuelve un OBJETO
+                    if (!$user || !$id) {
+                        $this->jsonResponse(["error" => "Faltan datos o permisos"], 400);
+                        return;
+                    }
+                    $this->deleteReview($id, $user);
+                    break;
 
-    private function deleteReview($reviewId, $user)
-    {
-        // 1. Verificar quién es el dueño de la reseña
-        $query = "SELECT user_id FROM reviews WHERE id = :id";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([':id' => $reviewId]);
-        $review = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$review) {
-            header("HTTP/1.1 404 Not Found");
-            echo json_encode(["error" => "Reseña no encontrada"]);
-            return;
-        }
-
-        // 2. Permisos: ¿Es Admin O es el dueño?
-        if ($user['role'] === 'admin' || $user['id'] == $review['user_id']) {
-            $delQuery = "DELETE FROM reviews WHERE id = :id";
-            $delStmt = $this->db->prepare($delQuery);
-            $delStmt->execute([':id' => $reviewId]);
-            echo json_encode(["message" => "Reseña eliminada"]);
-        } else {
-            header("HTTP/1.1 403 Forbidden");
-            echo json_encode(["error" => "No tienes permiso para borrar esto"]);
+                default:
+                    $this->jsonResponse(["error" => "Método no permitido"], 405);
+                    break;
+            }
+        } catch (Exception $e) {
+            // Captura cualquier error fatal y lo devuelve como JSON
+            $this->jsonResponse(["error" => "Error del Servidor: " . $e->getMessage()], 500);
         }
     }
 
     private function getReviewsByProduct($productId)
     {
-        // Traer reseñas con el nombre de usuario
-        $query = "SELECT r.*, u.username 
-                  FROM reviews r 
-                  JOIN users u ON r.user_id = u.id 
-                  WHERE r.product_id = :pid 
-                  ORDER BY r.created_at DESC";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([':pid' => $productId]);
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $this->reviewModel->getByProduct($productId);
         echo json_encode($result);
+    }
+
+    private function createReview($data, $userId)
+    {
+        if (!isset($data['product_id']) || !isset($data['rating']) || !isset($data['comment'])) {
+            $this->jsonResponse(["error" => "Datos incompletos"], 400);
+            return;
+        }
+
+        if ($this->reviewModel->create($userId, $data['product_id'], $data['rating'], $data['comment'])) {
+            $this->jsonResponse(["message" => "Reseña creada"], 201);
+        } else {
+            $this->jsonResponse(["error" => "No se pudo guardar la reseña"], 500);
+        }
+    }
+
+    private function deleteReview($reviewId, $user)
+    {
+        $review = $this->reviewModel->getOne($reviewId);
+
+        if (!$review) {
+            $this->jsonResponse(["error" => "Reseña no encontrada"], 404);
+            return;
+        }
+
+        // ⚠️ CORRECCIÓN AQUÍ TAMBIÉN: Usar ->role y ->id
+        if ($user->role === 'admin' || $user->id == $review['user_id']) {
+            if ($this->reviewModel->delete($reviewId)) {
+                $this->jsonResponse(["message" => "Reseña eliminada"], 200);
+            } else {
+                $this->jsonResponse(["error" => "Error al eliminar"], 500);
+            }
+        } else {
+            $this->jsonResponse(["error" => "No tienes permiso para borrar esta reseña"], 403);
+        }
+    }
+
+    // Helper para responder JSON siempre
+    private function jsonResponse($data, $status)
+    {
+        header("HTTP/1.1 " . $status);
+        echo json_encode($data);
     }
 }
 ?>

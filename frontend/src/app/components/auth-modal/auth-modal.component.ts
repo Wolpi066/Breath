@@ -25,7 +25,14 @@ export class AuthModalComponent {
 
     toggleMode() {
         this.mode.set(this.mode() === 'login' ? 'register' : 'login');
+        this.resetForm();
+    }
+
+    resetForm() {
         this.error = '';
+        this.username = '';
+        this.password = '';
+        this.email = '';
     }
 
     onSubmit() {
@@ -36,14 +43,12 @@ export class AuthModalComponent {
             }
             this.login.emit({ user: this.username, pass: this.password });
         } else {
-            // Validaciones de Registro
             if (!this.username || !this.email || !this.password) {
                 this.error = 'Completa todos los campos'; return;
             }
             if (this.username.length < 3) {
                 this.error = 'El usuario debe tener al menos 3 caracteres'; return;
             }
-            // Validación simple de email regex
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(this.email)) {
                 this.error = 'Email inválido'; return;

@@ -1,171 +1,123 @@
 <section class="admin-page">
     <div class="admin-wrapper">
-
         <div class="admin-header">
             <h1>ADMIN DASHBOARD</h1>
-            <div class="header-actions">
-                <button class="reset-db-btn" (click)="handleResetDB()">⚠️ RESETEAR DB</button>
-                <button class="close-btn" (click)="close.emit()">SALIR AL HOME</button>
-            </div>
+            <div class="header-actions"><button class="reset-db-btn" (click)="handleResetDB()">⚠️ RESETEAR
+                    DB</button><button class="close-btn" (click)="close.emit()">SALIR AL HOME</button></div>
         </div>
-
-        <div class="admin-tabs">
-            <button class="tab-button" [class.active]="activeTab === 'productos'"
-                (click)="setTab('productos')">PRODUCTOS</button>
-            <button class="tab-button" [class.active]="activeTab === 'banners'" (click)="setTab('banners')">BANNERS
-                HOME</button>
-        </div>
+        <div class="admin-tabs"><button class="tab-button" [class.active]="activeTab === 'productos'"
+                (click)="setTab('productos')">PRODUCTOS</button><button class="tab-button"
+                [class.active]="activeTab === 'banners'" (click)="setTab('banners')">BANNERS HOME</button></div>
 
         @if (activeTab === 'productos') {
         <div class="products-layout">
-
             <div class="form-section">
                 @if (isEditing) {
-                <h2 class="form-title">{{ editingProduct?.id ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}</h2>
-
+                <h2 class="form-title">{{ editingProduct?.id ? 'EDITAR' : 'NUEVO' }}</h2>
                 <form (ngSubmit)="handleSubmit($event)">
                     <div class="form-group"><label>NOMBRE</label><input type="text" [(ngModel)]="formData().name"
                             name="name" required></div>
                     <div class="form-group"><label>DESCRIPCIÓN</label><textarea [(ngModel)]="formData().description"
                             name="description" rows="3"></textarea></div>
-                    <div class="form-group"><label>CATEGORÍA</label>
-                        <select [(ngModel)]="formData().category" name="category" required>
-                            @for (cat of categoriesOptions; track cat) { <option [value]="cat">{{ cat.toUpperCase() }}
-                            </option> }
-                        </select>
-                    </div>
-
+                    <div class="form-group"><label>CATEGORÍA</label><select [(ngModel)]="formData().category"
+                            name="category" required>@for (cat of categoriesOptions; track cat) { <option [value]="cat">
+                                {{ cat.toUpperCase() }}</option> }</select></div>
                     <div class="price-discount-row">
-                        <div class="form-group"><label>PRECIO ($)</label><input type="number"
+                        <div class="form-group" style="flex: 1;"><label>PRECIO</label><input type="number"
                                 [(ngModel)]="formData().price" name="price" required></div>
-                        <div class="form-group"><label>DESCUENTO (%)</label><input type="number"
+                        <div class="form-group" style="flex: 1;"><label>DESCUENTO (%)</label><input type="number"
                                 [(ngModel)]="formData().discount" name="discount"></div>
                     </div>
-
                     <div class="form-group">
-                        <div class="size-header">
-                            <span>TALLES Y STOCK</span>
-                            <button type="button" class="add-size-btn" (click)="handleAddSize()">+ AGREGAR</button>
-                        </div>
-                        <div class="size-list">
-                            @for (sizeEntry of formData().sizes ?? []; track $index) {
-                            <div class="size-item">
-                                <select [(ngModel)]="formData().sizes![$index].size" name="s{{$index}}" required>
-                                    @for (s of sizesOptions; track s) { <option [value]="s">{{s}}</option> }
-                                </select>
-                                <input type="number" [(ngModel)]="formData().sizes![$index].stock" name="st{{$index}}"
-                                    placeholder="Stock">
-                                <button type="button" class="remove-btn" (click)="handleRemoveSize($index)">✕</button>
-                            </div>
-                            }
-                        </div>
+                        <div class="size-header"><span>TALLES</span><button type="button" class="add-size-btn"
+                                (click)="handleAddSize()">+ AGREGAR</button></div>
+                        <div class="size-list">@for (sizeEntry of formData().sizes ?? []; track $index) {<div
+                                class="size-item"><select [(ngModel)]="formData().sizes![$index].size"
+                                    name="s{{$index}}" required>@for (s of sizesOptions; track s) { <option [value]="s">
+                                        {{ s }}</option> }</select><input type="number"
+                                    [(ngModel)]="formData().sizes![$index].stock" name="st{{$index}}"
+                                    placeholder="Stock"><button type="button" class="remove-btn"
+                                    (click)="handleRemoveSize($index)">✕</button></div>}</div>
                     </div>
 
-                    <div class="form-group">
-                        <label>IMAGEN PRINCIPAL</label>
+                    <div class="form-group image-upload-wrapper">
+                        <label>IMAGEN PRINCIPAL *</label>
                         @if (mainImagePreview()) {
                         <div class="image-preview-container">
                             <img [src]="mainImagePreview()!" class="image-preview">
                             <button type="button" class="change-img-btn"
-                                onclick="document.getElementById('mainImageInput').click()">CAMBIAR IMAGEN</button>
+                                onclick="document.getElementById('mainImageInput').click()">CAMBIAR</button>
                         </div>
                         } @else {
-                        <label class="image-upload-wrapper">
-                            <span class="upload-icon">⭳</span>
-                            <span class="upload-text">HAZ CLIC PARA SUBIR</span>
-                            <input type="file" id="mainImageInput" style="display: none;"
-                                (change)="handleImageUpload($event, 'mainImage')" accept="image/*">
-                        </label>
+                        <label class="upload-area" onclick="document.getElementById('mainImageInput').click()"><span
+                                class="upload-icon">⭳</span><span class="upload-text">SUBIR PRINCIPAL</span></label>
                         }
                         <input type="file" id="mainImageInput" style="display: none;"
                             (change)="handleImageUpload($event, 'mainImage')" accept="image/*">
                     </div>
 
+                    <div class="form-group image-upload-wrapper">
+                        <label>IMAGEN HOVER (OPCIONAL)</label>
+                        @if (hoverImagePreview()) {
+                        <div class="image-preview-container">
+                            <img [src]="hoverImagePreview()!" class="image-preview">
+                            <button type="button" class="change-img-btn"
+                                onclick="document.getElementById('hoverImageInput').click()">CAMBIAR</button>
+                            <button type="button" class="remove-btn" (click)="hoverImagePreview.set(null)"
+                                style="width:100%; margin-top:5px;">QUITAR</button>
+                        </div>
+                        } @else {
+                        <label class="upload-area" onclick="document.getElementById('hoverImageInput').click()"><span
+                                class="upload-icon">⭳</span><span class="upload-text">SUBIR HOVER</span></label>
+                        }
+                        <input type="file" id="hoverImageInput" style="display: none;"
+                            (change)="handleImageUpload($event, 'hoverImage')" accept="image/*">
+                    </div>
+
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary">{{ editingProduct ? 'ACTUALIZAR' : 'GUARDAR'
-                            }}</button>
+                        <button type="submit" class="btn-primary">GUARDAR</button>
                         <button type="button" class="btn-secondary" (click)="cancelEdit()">CANCELAR</button>
                     </div>
                 </form>
                 } @else {
-                <div class="form-initial-state">
-                    <p>Selecciona un producto de la lista para editarlo</p>
-                    <button (click)="newProduct()" class="btn-secondary" style="margin-top:16px; border-width:2px;">+
-                        CREAR NUEVO PRODUCTO</button>
-                </div>
+                <div class="form-initial-state"><button (click)="newProduct()" class="btn-secondary">+ NUEVO
+                        PRODUCTO</button></div>
                 }
             </div>
-
             <div class="list-section">
                 <div class="list-header">
-                    <h2>INVENTARIO ({{ filteredProducts.length }})</h2>
-                    <select class="admin-select" [(ngModel)]="categoryFilter"
-                        (change)="onCategoryChange(categoryFilter)">
-                        <option value="todos">TODAS LAS CATEGORÍAS</option>
-                        @for (cat of categoriesOptions; track cat) { <option [value]="cat">{{ cat.toUpperCase() }}
-                        </option> }
+                    <h2>LISTADO ({{ filteredProducts.length }})</h2><select class="admin-select"
+                        [(ngModel)]="categoryFilter" (change)="onCategoryChange(categoryFilter)">
+                        <option value="todos">TODAS</option>@for (cat of categoriesOptions; track cat) { <option
+                            [value]="cat">{{ cat.toUpperCase() }}</option> }
                     </select>
                 </div>
-
-                <div class="product-list">
-                    @for (product of filteredProducts; track product.id) {
-                    <div class="product-card-admin">
+                <div class="product-list">@for (product of filteredProducts; track product.id) {<div
+                        class="product-card-admin">
                         <div class="product-image-thumb"><img [src]="product.mainImage"></div>
                         <div class="product-details">
                             <h3>{{ product.name }}</h3>
                             <p>{{ getCategoryLabel(product.category) }} | ${{ product.price }}</p>
                             <p style="font-size:11px; color:#888;">{{ getSizesLabel(product) }}</p>
                         </div>
-                        <div class="admin-actions">
-                            <button class="action-btn" (click)="handleEdit(product)">EDITAR</button>
-                            <button class="action-btn delete" (click)="handleDelete(product.id)">BORRAR</button>
-                        </div>
-                    </div>
-                    }
-                </div>
+                        <div class="admin-actions"><button class="action-btn"
+                                (click)="handleEdit(product)">EDITAR</button><button class="action-btn delete"
+                                (click)="handleDelete(product.id)">BORRAR</button></div>
+                    </div>}</div>
             </div>
         </div>
         }
-
         @if (activeTab === 'banners') {
         <div class="banner-section">
-            <div class="banner-item">
-                <span class="banner-label">BANNER PRINCIPAL (TOP)</span>
-                @if (banner1Preview()) {
-                <div class="image-preview-container">
-                    <img [src]="banner1Preview()!" class="image-preview">
-                    <button class="change-img-btn" onclick="document.getElementById('b1').click()">CAMBIAR
-                        IMAGEN</button>
-                    <input id="b1" type="file" style="display:none" (change)="handleImageUpload($event, 'banner1')">
-                </div>
-                } @else {
-                <label class="image-upload-wrapper">
-                    <span class="upload-icon">⭳</span>
-                    <span>SUBIR BANNER 1</span>
-                    <input type="file" style="display:none" (change)="handleImageUpload($event, 'banner1')">
-                </label>
-                }
-            </div>
-
-            <div class="banner-item">
-                <span class="banner-label">BANNER SECUNDARIO (BOTTOM)</span>
-                @if (banner2Preview()) {
-                <div class="image-preview-container">
-                    <img [src]="banner2Preview()!" class="image-preview">
-                    <button class="change-img-btn" onclick="document.getElementById('b2').click()">CAMBIAR
-                        IMAGEN</button>
-                    <input id="b2" type="file" style="display:none" (change)="handleImageUpload($event, 'banner2')">
-                </div>
-                } @else {
-                <label class="image-upload-wrapper">
-                    <span class="upload-icon">⭳</span>
-                    <span>SUBIR BANNER 2</span>
-                    <input type="file" style="display:none" (change)="handleImageUpload($event, 'banner2')">
-                </label>
-                }
-            </div>
-
-            <button class="save-banners-btn" (click)="handleSaveBanners()">GUARDAR TODOS LOS BANNERS</button>
+            <div class="banner-item"><label>BANNER 1</label>@if(banner1Preview()){<div><img [src]="banner1Preview()!"
+                        style="max-width:100%"><button onclick="document.getElementById('b1').click()">CAMBIAR</button>
+                </div>}@else{<button onclick="document.getElementById('b1').click()">SUBIR</button>}<input id="b1"
+                    type="file" style="display:none" (change)="handleImageUpload($event, 'banner1')"></div>
+            <div class="banner-item"><label>BANNER 2</label>@if(banner2Preview()){<div><img [src]="banner2Preview()!"
+                        style="max-width:100%"><button onclick="document.getElementById('b2').click()">CAMBIAR</button>
+                </div>}@else{<button onclick="document.getElementById('b2').click()">SUBIR</button>}<input id="b2"
+                    type="file" style="display:none" (change)="handleImageUpload($event, 'banner2')"></div>
+            <button class="save-banners-btn" (click)="handleSaveBanners()">GUARDAR BANNERS</button>
         </div>
         }
     </div>
