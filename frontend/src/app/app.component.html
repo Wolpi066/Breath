@@ -1,49 +1,40 @@
 @if (selectedProduct()) {
 <app-product-detail [product]="selectedProduct()!" [currentUser]="currentUser()" (close)="selectedProduct.set(null)"
     (addToCart)="addToCartWithSize($event)" (openCart)="openCart()"></app-product-detail>
-
 } @else {
-
 <div class="min-h-screen bg-black">
 
     @if (!isCartOpen()) {
     <app-minimal-navbar [cartItemsCount]="cartItemsCount()" [isLoggedIn]="!!currentUser()" (cartClick)="openCart()"
-        (authClick)="openAuth()" (navigate)="navigate($event)">
+        (authClick)="openAuth()" (navigate)="navigate($event)" (search)="handleSearch($event)">
     </app-minimal-navbar>
     }
 
     <main class="bg-white">
-
         @if (currentPage() === 'home') {
-
         <app-hero></app-hero>
-
         <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()"
             (addToCart)="addToCart($event)" (cardClick)="openProductDetail($event)">
         </app-minimal-product-grid>
-
         } @else if (currentPage() === 'productos') {
-        <app-products-page [adminProducts]="adminProducts()" (addToCart)="addToCart($event)">
+        <app-products-page [adminProducts]="adminProducts()" [searchQuery]="globalSearchTerm()"
+            (addToCart)="addToCart($event)">
         </app-products-page>
-
         } @else if (currentPage() === 'admin') {
         <app-admin-dashboard [products]="adminProducts()" [banners]="banners()" (close)="navigate('home')"
             (saveProduct)="saveProduct($event)" (deleteProduct)="deleteProduct($event)"
             (saveBanners)="saveBanners($event)">
         </app-admin-dashboard>
-
         } @else {
         <div style="padding-top: 150px; text-align: center; height: 60vh;">
             <h1>PÁGINA EN CONSTRUCCIÓN</h1>
-            <p>Sección: {{ currentPage() | uppercase }}</p>
-            <button (click)="navigate('home')"
-                style="margin-top:20px; padding:10px; background:black; color:white; cursor:pointer;">VOLVER</button>
+            <button (click)="navigate('home')">VOLVER</button>
         </div>
         }
     </main>
 
     @if (!isCartOpen() && currentPage() !== 'admin') {
-    <app-minimal-footer (adminClick)="navigate('admin')"></app-minimal-footer>
+    <app-minimal-footer [isAdmin]="isAdmin" (adminClick)="navigate('admin')"></app-minimal-footer>
     }
 
     <app-shopping-cart [isOpen]="isCartOpen()" [items]="cart()" (close)="closeCart()"
@@ -54,6 +45,5 @@
     <app-auth-modal [currentUser]="currentUser()" (close)="closeAuth()" (login)="handleLogin($event)"
         (register)="handleRegister($event)" (logout)="handleLogout()"></app-auth-modal>
     }
-
 </div>
 }

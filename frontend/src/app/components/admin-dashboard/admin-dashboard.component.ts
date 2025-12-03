@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Product } from '../../models/product.model';
 import { BannerData } from '../../models/banner.model';
 import { MinimalProductCardComponent } from '../minimal-product-card/minimal-product-card.component';
+import { ProductService } from '../../services/product.service';
 
 export interface ProductSize { size: string; stock: number; }
 
@@ -16,6 +17,8 @@ export interface ProductSize { size: string; stock: number; }
     styleUrls: ['./admin-dashboard.component.css'],
 })
 export class AdminDashboardComponent implements OnChanges {
+    private productService = inject(ProductService);
+
     @Input() products: Product[] = [];
     @Input() banners: BannerData = { banner1: '', banner2: '' };
     @Output() close = new EventEmitter<void>();
@@ -23,7 +26,6 @@ export class AdminDashboardComponent implements OnChanges {
     @Output() deleteProduct = new EventEmitter<string>();
     @Output() saveBanners = new EventEmitter<BannerData>();
 
-    // ESTADO INTERNO
     activeTab: 'productos' | 'banners' = 'productos';
     filteredProducts: Product[] = [];
     searchTerm = '';
@@ -31,10 +33,8 @@ export class AdminDashboardComponent implements OnChanges {
     isEditing = false;
     editingProduct: Product | null = null;
 
-    // FORMULARIO (Signals)
     formData = signal<Partial<Product>>({ category: 'remeras', price: 0, discount: 0, sizes: [{ size: 'S', stock: 0 }] });
 
-    // PREVIEWS (Signals)
     mainImagePreview = signal<string | null>(null);
     hoverImagePreview = signal<string | null>(null);
     banner1Preview = signal<string | null>(null);
@@ -44,35 +44,17 @@ export class AdminDashboardComponent implements OnChanges {
     sizesOptions = ['S', 'M', 'L', 'XL', 'XXL', 'Única'];
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['products']) {
-            this.applyFilters();
-        }
+        if (changes['products']) this.applyFilters();
         if (changes['banners']) {
             this.banner1Preview.set(this.banners?.banner1 || null);
             this.banner2Preview.set(this.banners?.banner2 || null);
         }
     }
 
-    // --- UI helpers ---
-    setTab(tab: 'productos' | 'banners'): void {
-        this.activeTab = tab;
-        this.cancelEdit();
-    }
+    setTab(tab: 'productos' | 'banners'): void { this.activeTab = tab; this.cancelEdit(); }
+    getCategoryLabel(category: string | undefined): string { return category?.toUpperCase() || 'OTRO'; }
+    getSizesLabel(product: Product): string { return product.sizes?.map(s => `${s.size}(${s.stock})`).join(', ') || ''; }
 
-    getCategoryLabel(category: string | undefined): string {
-        switch (category) {
-            case 'remeras': return 'REMERAS'; case 'buzos': return 'BUZOS';
-            case 'pantalones': return 'PANTALONES'; case 'gorras': return 'GORRAS';
-            default: return 'OTRO';
-        }
-    }
-
-    getSizesLabel(product: Product): string {
-        if (!product || !product.sizes) return '';
-        return product.sizes.map((s) => `${s.size}(${s.stock})`).join(', ');
-    }
-
-    // --- FILTROS ---
     applyFilters(): void {
         const list = this.products || [];
         this.filteredProducts = list.filter((p) => {
@@ -84,23 +66,23 @@ export class AdminDashboardComponent implements OnChanges {
         });
     }
 
-    onCategoryChange(category: string): void {
-        this.categoryFilter = category;
-        this.applyFilters();
-    }
+    onCategoryChange(category: string): void { this.categoryFilter = category; this.applyFilters(); }
 
-    // --- ABM (CRUD) ---
     newProduct(): void {
         this.isEditing = true;
-        this.editingProduct = { id: '', name: '', description: '', category: 'remeras', price: 0, discount: 0, sizes: [{ size: 'S', stock: 0 }], mainImage: '', hoverImage: '' };
+        // Inicializamos con objeto vacío válido para evitar null
+        const newProd = { id: '', name: '', description: '', category: 'remeras', price: 0, discount: 0, sizes: [{ size: 'S', stock: 0 }], mainImage: '', hoverImage: '' };
+        this.editingProduct = newProd as Product;
+        this.formData.set(newProd);
         this.mainImagePreview.set(null);
         this.hoverImagePreview.set(null);
     }
 
-    // 🟢 ESTA ES LA FUNCIÓN QUE BUSCABA EL HTML
     handleEdit(product: Product): void {
         this.isEditing = true;
-        this.editingProduct = JSON.parse(JSON.stringify(product));
+        const copy = JSON.parse(JSON.stringify(product));
+        this.editingProduct = copy;
+        this.formData.set(copy);
         this.mainImagePreview.set(product.mainImage);
         this.hoverImagePreview.set(product.hoverImage ?? null);
     }
@@ -112,27 +94,23 @@ export class AdminDashboardComponent implements OnChanges {
         this.hoverImagePreview.set(null);
     }
 
-    // ... (Resto de funciones ABM y Banners) ...
-
     handleImageUpload(event: Event, type: 'mainImage' | 'hoverImage' | 'banner1' | 'banner2') {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
         const file = input.files[0];
         const reader = new FileReader();
-
         reader.onload = () => {
             const base64String = reader.result as string;
-            if (type === 'mainImage') { this.mainImagePreview.set(base64String); this.formData.update(data => ({ ...data, mainImage: base64String })); }
-            else if (type === 'hoverImage') { this.hoverImagePreview.set(base64String); this.formData.update(data => ({ ...data, hoverImage: base64String })); }
+            if (type === 'mainImage') { this.mainImagePreview.set(base64String); this.formData.update(d => ({ ...d, mainImage: base64String })); }
+            else if (type === 'hoverImage') { this.hoverImagePreview.set(base64String); this.formData.update(d => ({ ...d, hoverImage: base64String })); }
             else if (type === 'banner1') { this.banner1Preview.set(base64String); }
             else if (type === 'banner2') { this.banner2Preview.set(base64String); }
         };
         reader.readAsDataURL(file);
     }
 
-    handleAddSize() { this.formData.update(data => ({ ...data, sizes: [...(data.sizes || []), { size: 'M', stock: 0 } as ProductSize] })); }
-
-    handleRemoveSize(index: number) { this.formData.update(data => ({ ...data, sizes: data.sizes?.filter((_, i) => i !== index) })); }
+    handleAddSize() { this.formData.update(d => ({ ...d, sizes: [...(d.sizes || []), { size: 'M', stock: 0 } as ProductSize] })); }
+    handleRemoveSize(index: number) { this.formData.update(d => ({ ...d, sizes: d.sizes?.filter((_, i) => i !== index) })); }
 
     handleUpdateSize(index: number, field: 'size' | 'stock', event: Event) {
         const value = (event.target as HTMLInputElement).value;
@@ -148,12 +126,11 @@ export class AdminDashboardComponent implements OnChanges {
         e.preventDefault();
         const data = this.formData();
         if (!data.name || data.price === undefined || !this.mainImagePreview()) { alert("Faltan campos requeridos."); return; }
-        if (!data.sizes || data.sizes.length === 0) { alert("Debe agregar al menos un talle."); return; }
 
         const finalProduct: Product = {
             ...this.editingProduct,
             ...data,
-            id: this.editingProduct?.id || Date.now().toString(),
+            id: this.editingProduct?.id || '',
             hoverImage: data.hoverImage || data.mainImage || '',
             description: data.description || '',
             mainImage: this.mainImagePreview() || ''
@@ -164,9 +141,7 @@ export class AdminDashboardComponent implements OnChanges {
     }
 
     handleDelete(id: string) {
-        if (confirm('¿Seguro que deseas eliminar este producto?')) {
-            this.deleteProduct.emit(id);
-        }
+        if (confirm('¿Eliminar producto?')) this.deleteProduct.emit(id);
     }
 
     handleSaveBanners() {
@@ -175,11 +150,18 @@ export class AdminDashboardComponent implements OnChanges {
             banner2: this.banner2Preview() || '',
         };
         this.saveBanners.emit(newBanners);
-        alert('Banners guardados correctamente.');
+        alert('Banners guardados');
         this.close.emit();
     }
 
-    onClose(): void {
-        this.close.emit();
+    handleResetDB() {
+        if (confirm("¿ESTÁS SEGURO? Esto borrará todos los datos y restaurará los de fábrica.")) {
+            this.productService.resetDatabase().subscribe({
+                next: (res) => { alert(res.message); window.location.reload(); },
+                error: (err) => alert('Error al resetear: ' + (err.error?.error || err.message))
+            });
+        }
     }
+
+    onClose(): void { this.close.emit(); }
 }

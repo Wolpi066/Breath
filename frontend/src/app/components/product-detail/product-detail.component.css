@@ -298,3 +298,24 @@
         gap: 30px;
     }
 }
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.delete-review-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    padding: 0;
+}
+
+.delete-review-btn:hover {
+    opacity: 1;
+    color: red;
+}

@@ -1,7 +1,11 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- 1. LIMPIEZA
-DROP DATABASE IF EXISTS `breath_shop`;
-CREATE DATABASE `breath_shop` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `breath_shop`;
+DROP TABLE IF EXISTS `reviews`;
+DROP TABLE IF EXISTS `product_variants`;
+DROP TABLE IF EXISTS `products`;
+DROP TABLE IF EXISTS `sizes`;
+DROP TABLE IF EXISTS `users`;
 
 -- 2. ESTRUCTURA
 CREATE TABLE `users` (
@@ -11,10 +15,8 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `role` enum('user','admin') DEFAULT 'user',
   `created_at` timestamp DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB;
+  PRIMARY KEY (`id`), UNIQUE KEY `username` (`username`), UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `products` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -27,13 +29,13 @@ CREATE TABLE `products` (
   `hover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `sizes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(10) NOT NULL,
   PRIMARY KEY (`id`), UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `product_variants` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -44,7 +46,7 @@ CREATE TABLE `product_variants` (
   FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`size_id`) REFERENCES `sizes` (`id`) ON DELETE CASCADE,
   UNIQUE KEY `unique_prod_size` (`product_id`, `size_id`)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `reviews` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -54,16 +56,14 @@ CREATE TABLE `reviews` (
   `comment` text DEFAULT NULL,
   `created_at` timestamp DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `product_id` (`product_id`),
+  KEY `user_id` (`user_id`), KEY `product_id` (`product_id`),
   CONSTRAINT `fk_reviews_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_reviews_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 3. DATOS DE PRUEBA (SEEDING)
-INSERT INTO `sizes` (`name`) VALUES ('S'), ('M'), ('L'), ('XL'), ('XXL'), ('Única');
+-- 3. DATOS
+INSERT INTO `sizes` (`id`, `name`) VALUES (1,'S'), (2,'M'), (3,'L'), (4,'XL'), (5,'XXL'), (6,'Única');
 
--- Productos
 INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `discount`, `main_image`, `hover_image`) VALUES
 (1, 'HOODIE BREATHE MASK', 'Buzo con capucha diseño máscara y "breathe"', 'buzos', 85.00, 0, 'assets/CARDS/NEWstfu.png', 'assets/CARDS/NEWstfu.png'),
 (2, 'HOODIE BREATHE ASTRONAUT', 'Buzo con capucha diseño "breathe" y astronauta rojo', 'buzos', 90.00, 0, 'assets/CARDS/NEWapollo.png', 'assets/CARDS/NEWapollo.png'),
@@ -72,12 +72,11 @@ INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `disco
 (5, 'HOODIE ROSWELL RECORD', 'Buzo con capucha diseño "Roswell Daily Record"', 'buzos', 90.00, 15, 'assets/CARDS/NEWroswell.png', 'assets/CARDS/NEWroswell.png'),
 (6, 'HOODIE TRAGEDY', 'Buzo con capucha "Thank you for the tragedy"', 'buzos', 85.00, 0, 'assets/CARDS/NEWtragedy.png', 'assets/CARDS/NEWtragedy.png'),
 (7, 'T-SHIRT WHO SHOT CUPID WHITE', 'Remera blanca "who shot cupid?" con cupido atravesado', 'remeras', 42.00, 10, 'assets/CARDS/NEWcupidBlanca.png', 'assets/CARDS/NEWcupidBlanca.png'),
-(8, 'T-SHIRT LAST HIT', 'Remera negra "last hit" con pintura renacentista de cupido', 'remeras', 45.00, 0, 'assets/CARDS/NEWlastHit.png', 'assets/CARDS/NEWlastHit.png'),
+(8, 'T-SHIRT LAST HIT', 'Remera negra "last hit" con pintura renacentista de cupido', 'remeras', 45.00, 0, 'assets/CARDS/NEWlasthit.png', 'assets/CARDS/NEWlasthit.png'), -- 👈 CORREGIDO AQUÍ
 (9, 'T-SHIRT WHO SHOT CUPID BLACK', 'Remera negra "who shot cupid?" con cupido atravesado', 'remeras', 42.00, 0, 'assets/CARDS/NEWcupidNegra.png', 'assets/CARDS/NEWcupidNegra.png'),
 (10, 'CAP BREATHE WHITE', 'Gorra blanca con bordado "breathe"', 'gorras', 30.00, 0, 'assets/CARDS/NEWgorraBlanca.png', 'assets/CARDS/NEWgorraBlanca.png'),
 (11, 'CAP BREATHE BLACK', 'Gorra negra con bordado "breathe"', 'gorras', 30.00, 0, 'assets/CARDS/NEWgorraNegra.png', 'assets/CARDS/NEWgorraNegra.png');
 
--- Variantes (Stock)
 INSERT INTO `product_variants` (`product_id`, `size_id`, `stock`) VALUES
 (1, 1, 7), (1, 2, 11), (1, 3, 9), (1, 4, 5),
 (2, 1, 6), (2, 2, 10), (2, 3, 8), (2, 4, 4),
@@ -91,6 +90,7 @@ INSERT INTO `product_variants` (`product_id`, `size_id`, `stock`) VALUES
 (10, 6, 25),
 (11, 6, 30);
 
--- Admin (Password: admin123)
 INSERT INTO `users` (`username`, `email`, `password`, `role`) VALUES
 ('admin', 'admin@breathe.com', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'admin');
+
+SET FOREIGN_KEY_CHECKS = 1;

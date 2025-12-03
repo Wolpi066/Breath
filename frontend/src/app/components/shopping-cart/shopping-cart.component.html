@@ -52,7 +52,9 @@
             <div class="summary-row"><span>Envío</span><span>{{ shipping === 0 ? 'GRATIS' : (shipping |
                     currency:'USD':'symbol':'1.0-0') }}</span></div>
             <div class="total-row"><span>TOTAL</span><span>{{ total | currency:'USD':'symbol':'1.0-0' }}</span></div>
-            <button class="checkout-btn">INICIAR COMPRA</button>
+
+            <button class="checkout-btn" (click)="initiateCheckout()">INICIAR COMPRA</button>
+
             <button class="continue-btn" (click)="onClose()">Seguir comprando</button>
         </div>
         }

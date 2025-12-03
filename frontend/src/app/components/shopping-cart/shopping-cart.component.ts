@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// Asegúrate de que esta ruta a CartItem sea correcta en tu proyecto
 import { CartItem } from '../../models/cart-item.model';
 
 @Component({
@@ -8,7 +7,7 @@ import { CartItem } from '../../models/cart-item.model';
     standalone: true,
     imports: [CommonModule],
     templateUrl: './shopping-cart.component.html',
-    styleUrls: ['./shopping-cart.component.css'], // Apunta al CSS puro
+    styleUrls: ['./shopping-cart.component.css'],
 })
 export class ShoppingCartComponent {
     @Input() isOpen = false;
@@ -41,5 +40,25 @@ export class ShoppingCartComponent {
 
     remove(item: CartItem): void {
         this.removeItem.emit({ id: item.id, size: item.size });
+    }
+
+    // ✅ FUNCIÓN WHATSAPP
+    initiateCheckout() {
+        if (this.items.length === 0) return;
+
+        // REEMPLAZA ESTE NÚMERO POR EL TUYO (Formato internacional sin +)
+        const phoneNumber = "5491135172352";
+
+        let message = "Hola BREATHE, quiero iniciar una compra:\n\n";
+
+        this.items.forEach(item => {
+            message += `• ${item.name} | Talle: ${item.size || 'Único'} | Cant: ${item.quantity} | $${item.price * item.quantity}\n`;
+        });
+
+        message += `\n*Total Final: $${this.total}*`;
+        message += "\n\nEspero confirmación para coordinar el pago y envío.";
+
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
     }
 }

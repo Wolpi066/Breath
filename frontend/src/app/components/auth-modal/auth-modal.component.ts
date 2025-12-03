@@ -18,7 +18,6 @@ export class AuthModalComponent {
 
     mode = signal<'login' | 'register'>('login');
 
-    // Campos del formulario
     username = '';
     password = '';
     email = '';
@@ -27,28 +26,32 @@ export class AuthModalComponent {
     toggleMode() {
         this.mode.set(this.mode() === 'login' ? 'register' : 'login');
         this.error = '';
-        this.username = '';
-        this.password = '';
-        this.email = '';
     }
 
     onSubmit() {
         this.error = '';
         if (this.mode() === 'login') {
             if (!this.username || !this.password) {
-                this.error = 'Por favor completa todos los campos';
-                return;
+                this.error = 'Completa todos los campos'; return;
             }
             this.login.emit({ user: this.username, pass: this.password });
         } else {
+            // Validaciones de Registro
             if (!this.username || !this.email || !this.password) {
-                this.error = 'Por favor completa todos los campos';
-                return;
+                this.error = 'Completa todos los campos'; return;
+            }
+            if (this.username.length < 3) {
+                this.error = 'El usuario debe tener al menos 3 caracteres'; return;
+            }
+            // Validación simple de email regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(this.email)) {
+                this.error = 'Email inválido'; return;
             }
             if (this.password.length < 6) {
-                this.error = 'La contraseña debe tener al menos 6 caracteres';
-                return;
+                this.error = 'La contraseña debe tener al menos 6 caracteres'; return;
             }
+
             this.register.emit({ user: this.username, email: this.email, pass: this.password });
         }
     }

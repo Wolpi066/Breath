@@ -16,39 +16,31 @@ class ProductController
 
     public function processRequest($id = null)
     {
-        // Leer el cuerpo JSON de la petición (para POST y PUT)
         $input = json_decode(file_get_contents('php://input'), true);
 
         switch ($this->requestMethod) {
             case 'GET':
-                if ($id) {
-                    echo json_encode(["message" => "Get single product pending"]);
-                } else {
+                if ($id)
+                    echo json_encode(["message" => "Single product pending"]);
+                else
                     $this->getAllProducts();
-                }
                 break;
-
             case 'POST':
                 $this->createProduct($input);
                 break;
-
             case 'PUT':
                 if ($id && $input) {
-                    // Aseguramos que el ID venga en el objeto
                     $input['id'] = $id;
                     $this->updateProduct($input);
                 } else {
                     header("HTTP/1.1 400 Bad Request");
-                    echo json_encode(["error" => "Datos o ID faltantes"]);
+                    echo json_encode(["error" => "Datos faltantes"]);
                 }
                 break;
-
             case 'DELETE':
-                if ($id) {
+                if ($id)
                     $this->deleteProduct($id);
-                }
                 break;
-
             default:
                 header("HTTP/1.1 405 Method Not Allowed");
                 break;
@@ -57,108 +49,125 @@ class ProductController
 
     private function getAllProducts()
     {
-        $result = $this->productModel->getAll();
-        echo json_encode($result);
+        echo json_encode($this->productModel->getAll());
     }
 
     private function createProduct($data)
     {
-        // 1. Procesar Imágenes (Base64 -> Archivo)
-        if (isset($data['mainImage'])) {
+        if (isset($data['mainImage']))
             $data['mainImage'] = $this->saveImage($data['mainImage'], 'products');
-        }
-        if (isset($data['hoverImage'])) {
+        if (isset($data['hoverImage']))
             $data['hoverImage'] = $this->saveImage($data['hoverImage'], 'products');
-        }
 
-        // 2. Guardar en DB
         if ($this->productModel->create($data)) {
             header("HTTP/1.1 201 Created");
-            echo json_encode(["message" => "Producto creado exitosamente"]);
+            echo json_encode(["message" => "Creado"]);
         } else {
-            header("HTTP/1.1 500 Internal Server Error");
-            echo json_encode(["error" => "No se pudo crear el producto"]);
+            header("HTTP/1.1 500 Error");
+            echo json_encode(["error" => "Error al crear"]);
         }
     }
 
     private function updateProduct($data)
     {
-        // 1. Procesar Imágenes si cambiaron
-        // (Si viene 'assets/...' es que no cambió. Si viene 'data:image...' es nueva)
+        // 1. Obtener el producto actual para saber qué imágenes tenía
+        $currentProduct = $this->getProductById($data['id']);
+
+        // 2. Procesar Main Image
         if (isset($data['mainImage']) && strpos($data['mainImage'], 'data:image') === 0) {
+            // Si hay imagen nueva, borramos la vieja
+            $this->deleteImageFile($currentProduct['main_image']);
             $data['mainImage'] = $this->saveImage($data['mainImage'], 'products');
         }
+
+        // 3. Procesar Hover Image
         if (isset($data['hoverImage']) && strpos($data['hoverImage'], 'data:image') === 0) {
+            $this->deleteImageFile($currentProduct['hover_image']);
             $data['hoverImage'] = $this->saveImage($data['hoverImage'], 'products');
         }
 
-        // 2. Actualizar en DB
         if ($this->productModel->update($data)) {
             header("HTTP/1.1 200 OK");
-            echo json_encode(["message" => "Producto actualizado"]);
+            echo json_encode(["message" => "Actualizado"]);
         } else {
-            header("HTTP/1.1 500 Internal Server Error");
-            echo json_encode(["error" => "No se pudo actualizar"]);
+            header("HTTP/1.1 500 Error");
+            echo json_encode(["error" => "Error al actualizar"]);
         }
     }
 
     private function deleteProduct($id)
     {
+        // 1. Obtener datos antes de borrar para saber qué archivos eliminar
+        $product = $this->getProductById($id);
+
         if ($this->productModel->delete($id)) {
+            // 2. Si se borró de la DB, borramos los archivos físicos
+            if ($product) {
+                $this->deleteImageFile($product['main_image']);
+                $this->deleteImageFile($product['hover_image']);
+            }
             header("HTTP/1.1 200 OK");
-            echo json_encode(["message" => "Producto eliminado"]);
+            echo json_encode(["message" => "Eliminado"]);
         } else {
-            header("HTTP/1.1 500 Internal Server Error");
-            echo json_encode(["error" => "No se pudo eliminar"]);
+            header("HTTP/1.1 500 Error");
+            echo json_encode(["error" => "Error al eliminar"]);
         }
     }
 
-    // --- HELPER: Guardar Base64 como archivo ---
+    // --- HELPERS ---
+
+    private function getProductById($id)
+    {
+        // Pequeña query auxiliar directa para obtener rutas de imágenes
+        $query = "SELECT main_image, hover_image FROM products WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    private function deleteImageFile($path)
+    {
+        if (!$path)
+            return;
+
+        // El path viene como "uploads/products/foto.jpg"
+        // Agregamos __DIR__ para llegar a la ruta absoluta desde 'controllers'
+        $fullPath = __DIR__ . '/../' . $path;
+
+        // Solo borramos si es un archivo real y no una URL externa o asset estático
+        if (file_exists($fullPath) && strpos($path, 'uploads/') === 0) {
+            unlink($fullPath);
+        }
+    }
+
     private function saveImage($base64_string, $subfolder)
     {
-        // Si no es base64, devolver tal cual (ya es una ruta)
-        if (strpos($base64_string, 'data:image') !== 0) {
+        if (strpos($base64_string, 'data:image') !== 0)
             return $base64_string;
-        }
 
-        // 1. Separar la metadata del contenido
-        // "data:image/png;base64,iVBORw0KGgo..."
         $parts = explode(',', $base64_string);
-        $metadata = $parts[0];
         $data = $parts[1];
 
-        // 2. Determinar extensión
+        // Detectar extensión
         $extension = 'jpg';
-        if (strpos($metadata, 'image/png') !== false)
+        if (strpos($parts[0], 'png') !== false)
             $extension = 'png';
-        if (strpos($metadata, 'image/jpeg') !== false)
-            $extension = 'jpg';
-        if (strpos($metadata, 'image/webp') !== false)
+        elseif (strpos($parts[0], 'webp') !== false)
             $extension = 'webp';
 
-        // 3. Decodificar
         $decodedData = base64_decode($data);
-
-        // 4. Crear nombre único
         $filename = uniqid() . '.' . $extension;
 
-        // 5. Ruta de guardado (backend/uploads/products/)
-        // Ajustamos la ruta relativa al index.php del backend
         $uploadDir = 'uploads/' . $subfolder . '/';
 
-        // Crear carpeta si no existe
+        // Crear carpeta física si no existe (relativa a index.php)
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        // Guardar archivo
         file_put_contents($uploadDir . $filename, $decodedData);
-
-        // 6. Devolver la ruta relativa para guardar en la BD
-        // OJO: Angular buscará esto. Depende de cómo sirvas los archivos.
-        // Por ahora devolvemos la ruta relativa al backend.
-        // En Angular tendrás que prefijar la URL de la API.
-        return 'uploads/' . $subfolder . '/' . $filename;
+        return $uploadDir . $filename;
     }
 }
 ?>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../models/product.model';
@@ -20,7 +20,7 @@ export class ProductDetailComponent implements OnChanges {
 
     @Output() close = new EventEmitter<void>();
     @Output() addToCart = new EventEmitter<{ id: string, size: string }>();
-    @Output() openCart = new EventEmitter<void>(); // Para abrir carrito tras agregar
+    @Output() openCart = new EventEmitter<void>();
 
     selectedSize = signal<string | null>(null);
     reviews = signal<Review[]>([]);
@@ -30,6 +30,8 @@ export class ProductDetailComponent implements OnChanges {
     hoverRating = 0;
     comment = '';
 
+    get isAdmin(): boolean { return this.currentUser === 'admin'; }
+
     ngOnChanges(changes: SimpleChanges) {
         if (changes['product'] && this.product) {
             this.selectedSize.set(null);
@@ -37,21 +39,19 @@ export class ProductDetailComponent implements OnChanges {
         }
     }
 
-    // --- LÓGICA CARRITO ---
     getStock(size: string): number {
         return this.product.sizes.find(s => s.size === size)?.stock || 0;
     }
 
     onAddToCartClick() {
         if (!this.selectedSize()) {
-            alert('Por favor selecciona un talle');
-            return;
+            alert('Por favor selecciona un talle'); return;
         }
         this.addToCart.emit({ id: this.product.id, size: this.selectedSize()! });
-        this.openCart.emit(); // Abrir carrito lateral
+        this.openCart.emit();
     }
 
-    // --- LÓGICA RESEÑAS ---
+    // --- RESEÑAS ---
     loadReviews() {
         const key = `breath-reviews-${this.product.id}`;
         const saved = localStorage.getItem(key);
@@ -71,12 +71,18 @@ export class ProductDetailComponent implements OnChanges {
             date: new Date().toISOString()
         };
 
-        const updated = [...this.reviews(), newReview];
+        const updated = [newReview, ...this.reviews()];
         this.reviews.set(updated);
         localStorage.setItem(`breath-reviews-${this.product.id}`, JSON.stringify(updated));
 
-        // Reset form
         this.rating = 0;
         this.comment = '';
+    }
+
+    deleteReview(reviewId: string) {
+        if (!confirm('¿Borrar reseña?')) return;
+        const updated = this.reviews().filter(r => r.id !== reviewId);
+        this.reviews.set(updated);
+        localStorage.setItem(`breath-reviews-${this.product.id}`, JSON.stringify(updated));
     }
 }

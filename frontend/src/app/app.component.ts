@@ -1,10 +1,10 @@
-import { Component, HostListener, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, HostListener, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Componentes
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { MinimalProductGridComponent } from './components/minimal-product-grid/minimal-product-grid.component';
+// ✅ MANTENIDO PLURAL
 import { ProductsPageComponent } from './components/products-page/products-page.components';
 import { MinimalFooterComponent } from './components/minimal-footer/minimal-footer.component';
 import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.component';
@@ -12,13 +12,11 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
 import { ProductDetailComponent } from './components/product-detail/product-detail.component';
 
-// Modelos y Servicios
 import { Product } from './models/product.model';
 import { BannerData } from './models/banner.model';
 import { AuthService } from './services/auth.service';
 import { ProductService } from './services/product.service';
 
-// Rutas de imágenes fallback (por si la DB falla)
 const banner1Img = 'assets/CARDS/calleNoche.jpg';
 const banner2Img = 'assets/CARDS/wmremove-transformed.png';
 
@@ -26,56 +24,55 @@ const banner2Img = 'assets/CARDS/wmremove-transformed.png';
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, MinimalNavbarComponent, HeroComponent, MinimalProductGridComponent,
-    ProductsPageComponent, MinimalFooterComponent, ShoppingCartComponent,
-    AdminDashboardComponent, AuthModalComponent, ProductDetailComponent
+    CommonModule,
+    MinimalNavbarComponent,
+    HeroComponent,
+    MinimalProductGridComponent,
+    ProductsPageComponent,
+    MinimalFooterComponent,
+    ShoppingCartComponent,
+    AdminDashboardComponent,
+    AuthModalComponent,
+    ProductDetailComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
 
-  // Inyección de Servicios
   private authService = inject(AuthService);
   private productService = inject(ProductService);
 
-  // --- ESTADO ---
+  // ESTADO
   currentPage = signal<'home' | 'productos' | 'contacto' | 'about' | 'admin'>('home');
-
   cart = signal<{ id: string; name: string; price: number; quantity: number; image: string; size?: string }[]>([]);
   cartItemsCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
 
-  // UI States
   isCartOpen = signal(false);
   isAuthOpen = signal(false);
   selectedProduct = signal<Product | null>(null);
+  globalSearchTerm = signal('');
 
-  // Data Real (Viene del Backend)
   adminProducts = signal<Product[]>([]);
   banners = signal<BannerData>({ banner1: banner1Img, banner2: banner2Img });
 
-  // Auth State (Conectado al servicio)
-  currentUser = this.authService.currentUser; // Signal enlazada al servicio
+  currentUser = this.authService.currentUser;
+
+  get isAdmin(): boolean {
+    return this.currentUser() === 'admin';
+  }
 
   ngOnInit() {
     this.loadDataFromBackend();
   }
 
-  // --- CARGA DE DATOS REALES ---
   loadDataFromBackend() {
     this.productService.getProducts().subscribe({
-      next: (data) => {
-        console.log('📦 Productos cargados desde MySQL:', data);
-        this.adminProducts.set(data);
-      },
-      error: (err) => {
-        console.error('❌ Error conectando al Backend:', err);
-        alert('Error de conexión con el servidor. Revisa que XAMPP esté corriendo.');
-      }
+      next: (data) => this.adminProducts.set(data),
+      error: (err) => console.error('Error API:', err)
     });
-
-    // Banners
-    this.banners.set(this.productService.getBanners());
+    const savedBanners = this.productService.getBanners();
+    if (savedBanners) this.banners.set(savedBanners);
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -86,14 +83,17 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // --- NAVEGACIÓN ---
+  handleSearch(term: string) {
+    this.globalSearchTerm.set(term);
+    if (term) this.navigate('productos');
+  }
+
   navigate(page: 'home' | 'productos' | 'contacto' | 'about' | 'admin') {
     this.currentPage.set(page);
     this.selectedProduct.set(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // --- UI ---
   openCart() { this.isCartOpen.set(true); }
   closeCart() { this.isCartOpen.set(false); }
   openAuth() { this.isAuthOpen.set(true); }
@@ -104,25 +104,17 @@ export class AppComponent implements OnInit {
     if (p) this.selectedProduct.set(p);
   }
 
-  // --- AUTH ACTIONS (Reales) ---
   handleLogin(data: { user: string, pass: string }) {
     this.authService.login(data.user, data.pass).subscribe({
-      next: () => {
-        this.closeAuth();
-        // alert('Bienvenido ' + data.user);
-      },
-      error: (err) => alert('Login fallido: ' + (err.error?.error || 'Credenciales incorrectas'))
+      next: () => this.closeAuth(),
+      error: (err) => alert(err.error?.error || 'Error login')
     });
   }
 
   handleRegister(data: any) {
     this.authService.register(data.user, data.email, data.pass).subscribe({
-      next: () => {
-        this.closeAuth();
-        alert('Registro exitoso. Inicia sesión.');
-        this.openAuth();
-      },
-      error: (err) => alert('Error registro: ' + (err.error?.error || 'Intenta de nuevo'))
+      next: () => { this.closeAuth(); this.openAuth(); },
+      error: (err) => alert(err.error?.error || 'Error registro')
     });
   }
 
@@ -132,7 +124,6 @@ export class AppComponent implements OnInit {
     this.navigate('home');
   }
 
-  // --- CARRITO ---
   addToCart(productId: string) {
     const product = this.adminProducts().find((p) => p.id === productId);
     if (!product) return;
@@ -155,52 +146,36 @@ export class AppComponent implements OnInit {
     if (existing) {
       this.cart.update(prev => prev.map(i => i.id === cartItemId ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      this.cart.update(prev => [...prev, {
-        id: cartItemId, name: product.name, price: finalPrice,
-        quantity: 1, image: product.mainImage, size: size
-      }]);
+      this.cart.update(prev => [...prev, { id: cartItemId, name: product.name, price: finalPrice, quantity: 1, image: product.mainImage, size: size }]);
     }
   }
 
   updateQuantity(event: { id: string; quantity: number }) {
     this.cart.update((prev) => prev.map((i) => i.id === event.id ? { ...i, quantity: event.quantity } : i));
   }
-
   removeItem(event: { id: string; size?: string }) {
     const id = event.id;
     this.cart.update((prev) => prev.filter((i) => i.id !== id));
   }
 
-  // --- ADMIN CRUD (Conectado al Backend) ---
   saveProduct(product: Product) {
-    // Si tiene ID y existe en la lista, es Edición
     if (product.id && this.adminProducts().some(p => p.id === product.id)) {
-      this.productService.updateProduct(product).subscribe({
-        next: () => {
-          this.loadDataFromBackend(); // Recarga real
-          alert('Producto actualizado');
-        },
-        error: (err) => alert('Error al actualizar: ' + err.message)
+      this.productService.updateProduct(product).subscribe(() => {
+        this.loadDataFromBackend();
+        alert('Producto actualizado');
       });
     } else {
-      // Crear Nuevo
-      this.productService.createProduct(product).subscribe({
-        next: () => {
-          this.loadDataFromBackend(); // Recarga real
-          alert('Producto creado');
-        },
-        error: (err) => alert('Error al crear: ' + err.message)
+      this.productService.createProduct(product).subscribe(() => {
+        this.loadDataFromBackend();
+        alert('Producto creado');
       });
     }
   }
 
   deleteProduct(id: string) {
-    this.productService.deleteProduct(id).subscribe({
-      next: () => {
-        this.loadDataFromBackend(); // Recarga real
-        alert('Producto eliminado');
-      },
-      error: (err) => alert('Error al eliminar: ' + err.message)
+    this.productService.deleteProduct(id).subscribe(() => {
+      this.loadDataFromBackend();
+      alert('Producto eliminado');
     });
   }
 

@@ -10,48 +10,72 @@ import { BannerData } from '../models/banner.model';
     providedIn: 'root'
 })
 export class ProductService {
-    private apiUrl = environment.apiurl + 'products'; // http://localhost/Breath/backend/products
+    private apiUrl = environment.apiurl + 'products';
+    private adminUrl = environment.apiurl + 'admin';
+    // Base URL para imágenes subidas (ajusta si tu carpeta backend está en otro lado)
+    private backendBaseUrl = 'http://localhost/Breath/backend/';
+
+    private defaultBanners: BannerData = {
+        banner1: 'assets/CARDS/calleNoche.jpg',
+        banner2: 'assets/CARDS/wmremove-transformed.png'
+    };
 
     constructor(
         private http: HttpClient,
         private authService: AuthService
     ) { }
 
-    // GET: Trae los datos de MySQL
+    // Helper para arreglar URLs de imágenes
+    private fixImageUrl(url: string): string {
+        if (!url) return '';
+        // Si ya es http o assets, la dejamos. Si es uploads/, le pegamos el dominio.
+        if (url.startsWith('http') || url.startsWith('assets')) return url;
+        return this.backendBaseUrl + url;
+    }
+
     getProducts(): Observable<Product[]> {
         return this.http.get<Product[]>(this.apiUrl).pipe(
             map(products => {
-                // Aseguramos tipos numéricos
                 return products.map(p => ({
                     ...p,
                     price: Number(p.price),
                     discount: Number(p.discount),
-                    // Asegurar que sizes sea array (si viene null del back)
-                    sizes: p.sizes || []
+                    sizes: p.sizes || [],
+                    // Arreglamos las rutas de las imágenes al recibirlas
+                    mainImage: this.fixImageUrl(p.mainImage),
+                    hoverImage: this.fixImageUrl(p.hoverImage || '')
                 }));
             })
         );
     }
 
-    // POST: Crear (Requiere Token)
+    // ... (El resto de métodos CRUD queda igual, ya que envían la info correcta) ...
     createProduct(product: Product): Observable<any> {
         return this.http.post(this.apiUrl, product, { headers: this.authService.authHeaders });
     }
 
-    // PUT: Editar (Requiere Token)
     updateProduct(product: Product): Observable<any> {
         return this.http.put(`${this.apiUrl}/${product.id}`, product, { headers: this.authService.authHeaders });
     }
 
-    // DELETE: Borrar (Requiere Token)
     deleteProduct(id: string): Observable<any> {
         return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.authService.authHeaders });
     }
 
-    // Banners (Simulado por ahora hasta que hagas la tabla banners, usa LocalStorage para no perderlos)
+    resetDatabase(): Observable<any> {
+        return this.http.post(`${this.adminUrl}/reset-db`, {}, { headers: this.authService.authHeaders });
+    }
+
     getBanners(): BannerData {
         const saved = localStorage.getItem('breath-banners');
-        return saved ? JSON.parse(saved) : { banner1: '', banner2: '' };
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            return {
+                banner1: this.fixImageUrl(parsed.banner1) || this.defaultBanners.banner1,
+                banner2: this.fixImageUrl(parsed.banner2) || this.defaultBanners.banner2
+            };
+        }
+        return this.defaultBanners;
     }
 
     saveBanners(banners: BannerData) {

@@ -23,7 +23,8 @@
 
             @if (isSearchOpen) {
             <div class="search-box-inline">
-                <input type="text" [(ngModel)]="searchQuery" placeholder="BUSCAR..." autoFocus (blur)="toggleSearch()">
+                <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch($event)"
+                    placeholder="BUSCAR PRODUCTOS..." autoFocus>
                 <button class="close-search-btn" (click)="toggleSearch()">✕</button>
             </div>
             } @else {
@@ -40,10 +41,7 @@
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-
-                @if (isLoggedIn) {
-                <span class="user-dot"></span>
-                }
+                @if (isLoggedIn) { <span class="user-dot"></span> }
             </button>
 
             <button class="nav-btn relative" (click)="openCart()">
@@ -52,9 +50,7 @@
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <path d="M16 10a4 4 0 0 1-8 0"></path>
                 </svg>
-                @if (cartItemsCount > 0) {
-                <span class="cart-badge">{{ cartItemsCount }}</span>
-                }
+                @if (cartItemsCount > 0) { <span class="cart-badge">{{ cartItemsCount }}</span> }
             </button>
         </div>
 

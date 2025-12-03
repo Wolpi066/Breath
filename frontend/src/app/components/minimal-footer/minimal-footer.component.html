@@ -1,10 +1,8 @@
 <footer class="footer-container">
     <div class="footer-wrapper">
 
-        <!-- GRID DE 4 COLUMNAS -->
         <div class="footer-columns">
 
-            <!-- Columna 1 -->
             <div class="footer-section footer-about">
                 <h3 class="section-title">BREATHE</h3>
                 <p class="description-text">
@@ -12,7 +10,6 @@
                 </p>
             </div>
 
-            <!-- Columna 2 -->
             <div class="footer-section">
                 <h3 class="section-title">SHOP</h3>
                 <ul class="link-list">
@@ -22,7 +19,6 @@
                 </ul>
             </div>
 
-            <!-- Columna 3 -->
             <div class="footer-section">
                 <h3 class="section-title">INFO</h3>
                 <ul class="link-list">
@@ -31,18 +27,8 @@
                     <li><a href="#" class="footer-link">Envíos</a></li>
                 </ul>
             </div>
-
-            <!-- Columna 4 -->
-            <div class="footer-section footer-newsletter">
-                <h3 class="section-title">NEWSLETTER</h3>
-                <div class="newsletter-form">
-                    <input type="email" placeholder="Tu email" class="newsletter-input">
-                    <button class="newsletter-button">SUSCRIBIRSE</button>
-                </div>
-            </div>
         </div>
 
-        <!-- SECCIÓN INFERIOR -->
         <div class="footer-bottom">
             <div class="bottom-content">
                 <div class="copyright-area">
@@ -50,10 +36,11 @@
                         © 2025 BREATHE. Todos los derechos reservados.
                     </p>
 
-                    <!-- 🟢 BOTÓN ADMIN SIEMPRE VISIBLE -->
+                    @if (isAdmin) {
                     <button (click)="onAdminClick()" class="admin-link" title="Acceso administrador">
                         ADMIN
                     </button>
+                    }
                 </div>
 
                 <div class="social-icons">

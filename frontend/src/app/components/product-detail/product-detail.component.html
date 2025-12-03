@@ -1,9 +1,7 @@
 <div class="detail-page">
 
     <header class="detail-header">
-        <button class="back-btn" (click)="close.emit()">
-            <span class="icon">‹</span> VOLVER
-        </button>
+        <button class="back-btn" (click)="close.emit()">‹ VOLVER</button>
         <div class="header-logo">
             <img src="assets/breathe/logoBreatheBlanco.png" class="logo-img-black" alt="Breathe">
         </div>
@@ -18,7 +16,6 @@
             </div>
 
             <div class="info-section">
-
                 <h1 class="product-title">{{ product.name }}</h1>
                 <p class="product-cat">{{ product.category }}</p>
 
@@ -33,9 +30,7 @@
                     }
                 </div>
 
-                <div class="shipping-banner">
-                    ENVÍO GRATIS A TODO EL PAÍS
-                </div>
+                <div class="shipping-banner">ENVÍO GRATIS A TODO EL PAÍS</div>
 
                 <div class="sizes-grid">
                     @for (s of product.sizes; track s.size) {
@@ -47,7 +42,7 @@
                 </div>
 
                 @if (selectedSize()) {
-                <p class="stock-info">Stock disponible: {{ getStock(selectedSize()!) }}</p>
+                <p class="stock-info">Stock: {{ getStock(selectedSize()!) }}</p>
                 }
 
                 <button class="add-btn" [disabled]="!selectedSize()" (click)="onAddToCartClick()">
@@ -60,14 +55,6 @@
                     <p>{{ product.description }}</p>
                 </div>
                 }
-
-                <div class="extra-info">
-                    <p>• 100% Algodón premium</p>
-                    <p>• Corte regular fit</p>
-                    <p>• Lavado a máquina máx. 30°</p>
-                    <p>• Hecho en Argentina</p>
-                </div>
-
             </div>
         </div>
 
@@ -87,9 +74,12 @@
                             <span class="star" [class.filled]="i <= review.rating">★</span>
                             }
                         </div>
+                        @if (currentUser === review.username || isAdmin) {
+                        <button class="delete-review-btn" (click)="deleteReview(review.id)">🗑</button>
+                        }
                     </div>
                     <p class="review-comment">{{ review.comment }}</p>
-                    <p class="review-date">{{ review.date | date:'longDate' }}</p>
+                    <p class="review-date">{{ review.date | date:'shortDate' }}</p>
                 </div>
                 }
             </div>
@@ -97,21 +87,19 @@
 
             @if (currentUser) {
             <div class="review-form">
-                <h4>ESCRIBIR RESEÑA</h4>
-
+                <h4>DEJAR UNA OPINIÓN</h4>
                 <div class="star-input">
                     @for (i of [1,2,3,4,5]; track i) {
                     <span class="star interactive" [class.filled]="i <= (hoverRating || rating)"
                         (mouseenter)="hoverRating = i" (mouseleave)="hoverRating = 0" (click)="rating = i">★</span>
                     }
                 </div>
-
-                <textarea [(ngModel)]="comment" placeholder="Comparte tu experiencia..."></textarea>
-                <button (click)="submitReview()">PUBLICAR RESEÑA</button>
+                <textarea [(ngModel)]="comment" placeholder="Escribe tu opinión..."></textarea>
+                <button (click)="submitReview()">PUBLICAR</button>
             </div>
             } @else {
             <div class="login-prompt">
-                <p>Debes iniciar sesión para dejar una reseña</p>
+                <p>Debes iniciar sesión para dejar una reseña.</p>
             </div>
             }
 
