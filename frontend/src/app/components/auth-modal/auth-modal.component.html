@@ -48,6 +48,10 @@
                 <div class="error-msg">{{ error }}</div>
                 }
 
+                @if (successMessage) {
+                <div class="success-msg">{{ successMessage }}</div>
+                }
+
                 <button type="submit" class="submit-btn">
                     {{ mode() === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA' }}
                 </button>

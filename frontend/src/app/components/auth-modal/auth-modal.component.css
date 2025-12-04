@@ -6,7 +6,6 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 3000;
-    /* Encima de todo */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -18,7 +17,6 @@
     max-width: 400px;
     padding: 0;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    /* Sin border-radius (Minimalista) */
 }
 
 .auth-header {
@@ -108,6 +106,16 @@
     font-size: 11px;
     margin-bottom: 15px;
     border: 1px solid #fecaca;
+}
+
+/* ✅ Estilo para Mensaje de Éxito */
+.success-msg {
+    background: #f0fdf4;
+    color: #15803d;
+    padding: 10px;
+    font-size: 11px;
+    margin-bottom: 15px;
+    border: 1px solid #bbf7d0;
 }
 
 /* Estado Logueado */

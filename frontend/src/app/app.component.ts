@@ -1,4 +1,4 @@
-import { Component, HostListener, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, HostListener, signal, computed, inject, OnInit, ViewChild } from '@angular/core'; // ✅ Added ViewChild
 import { CommonModule } from '@angular/common';
 
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
@@ -41,6 +41,9 @@ export class AppComponent implements OnInit {
 
   private authService = inject(AuthService);
   private productService = inject(ProductService);
+
+  // ✅ Referencia al Modal para manipularlo
+  @ViewChild(AuthModalComponent) authModal!: AuthModalComponent;
 
   // ESTADO
   currentPage = signal<'home' | 'productos' | 'contacto' | 'about' | 'admin'>('home');
@@ -104,11 +107,10 @@ export class AppComponent implements OnInit {
   openAuth() { this.isAuthOpen.set(true); }
   closeAuth() { this.isAuthOpen.set(false); }
 
-  // ✅ NUEVO MÉTODO: Maneja el login desde el detalle
   handleAuthRedirect() {
-    this.selectedProduct.set(null); // 1. Cierra el detalle
-    this.navigate('home');          // 2. Va al home
-    this.openAuth();                // 3. Abre el modal de login
+    this.selectedProduct.set(null);
+    this.navigate('home');
+    this.openAuth();
   }
 
   openProductDetail(productId: string) {
@@ -126,7 +128,12 @@ export class AppComponent implements OnInit {
 
   handleRegister(data: any) {
     this.authService.register(data.user, data.email, data.pass).subscribe({
-      next: () => { this.closeAuth(); this.openAuth(); },
+      next: () => {
+        // ✅ EN LUGAR DE CERRAR, LLAMAMOS AL MÉTODO DEL HIJO
+        if (this.authModal) {
+          this.authModal.showRegisterSuccess();
+        }
+      },
       error: (err) => alert(err.error?.error || 'Error registro')
     });
   }
