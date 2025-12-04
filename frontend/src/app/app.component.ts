@@ -1,4 +1,4 @@
-import { Component, HostListener, signal, computed, inject, OnInit, ViewChild } from '@angular/core'; // ✅ Added ViewChild
+import { Component, HostListener, signal, computed, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
@@ -15,6 +15,7 @@ import { Product } from './models/product.model';
 import { BannerData } from './models/banner.model';
 import { AuthService } from './services/auth.service';
 import { ProductService } from './services/product.service';
+import { CartService } from './services/cart.service'; // ✅ Importamos el servicio
 
 const banner1Img = 'assets/CARDS/calleNoche.jpg';
 const banner2Img = 'assets/CARDS/wmremove-transformed.png';
@@ -41,13 +42,19 @@ export class AppComponent implements OnInit {
 
   private authService = inject(AuthService);
   private productService = inject(ProductService);
+  public cartService = inject(CartService); // ✅ Inyectamos público para usar en computed
 
-  // ✅ Referencia al Modal para manipularlo
   @ViewChild(AuthModalComponent) authModal!: AuthModalComponent;
 
   // ESTADO
   currentPage = signal<'home' | 'productos' | 'contacto' | 'about' | 'admin'>('home');
-  cart = signal<{ id: string; name: string; price: number; quantity: number; image: string; size?: string }[]>([]);
+
+  // ✅ El carrito ahora es reactivo basado en el servicio
+  // Mantenemos la señal 'cart' para que el HTML existente no se rompa, 
+  // pero la actualizaremos cada vez que el servicio cambie.
+  cart = signal(this.cartService.items);
+
+  // Computed basado en el signal local que sincronizamos con el servicio
   cartItemsCount = computed(() => this.cart().reduce((acc, item) => acc + item.quantity, 0));
 
   // UI
@@ -60,7 +67,6 @@ export class AppComponent implements OnInit {
   adminProducts = signal<Product[]>([]);
   banners = signal<BannerData>({ banner1: banner1Img, banner2: banner2Img });
 
-  // Auth
   currentUser = this.authService.currentUser;
 
   get isAdmin(): boolean {
@@ -129,7 +135,6 @@ export class AppComponent implements OnInit {
   handleRegister(data: any) {
     this.authService.register(data.user, data.email, data.pass).subscribe({
       next: () => {
-        // ✅ EN LUGAR DE CERRAR, LLAMAMOS AL MÉTODO DEL HIJO
         if (this.authModal) {
           this.authModal.showRegisterSuccess();
         }
@@ -144,56 +149,91 @@ export class AppComponent implements OnInit {
     this.navigate('home');
   }
 
-  // CARRITO
+  // --- CARRITO (LÓGICA CONECTADA AL SERVICIO) ---
+
+  // Este método se usa desde el grid rápido (home/productos)
   addToCart(productId: string) {
     const product = this.adminProducts().find((p) => p.id === productId);
     if (!product) return;
-    this.addItemToCart(product, 'Única');
+
+    // Asumimos talle 'Única' o el primer talle disponible si es compra rápida
+    const sizeName = 'Única';
+    const sizeInfo = product.sizes.find(s => s.size === sizeName) || product.sizes[0];
+
+    // Si no hay stock ni siquiera para agregar 1
+    if (!sizeInfo || sizeInfo.stock <= 0) {
+      alert("Sin stock disponible");
+      return;
+    }
+
+    this.processAddToCart(product, sizeInfo.size, 1, sizeInfo.stock);
   }
 
-  addToCartWithSize(data: { id: string, size: string, quantity: number }) {
+  // Este método se usa desde el Product Detail (viene con stock validado pero igual validamos)
+  addToCartWithSize(data: { id: string, size: string, quantity: number, stock?: number }) {
     const product = this.adminProducts().find((p) => p.id === data.id);
     if (!product) return;
 
-    const finalPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price;
-    const cartItemId = `${product.id}-${data.size}`;
-
-    const existing = this.cart().find((i) => i.id === cartItemId);
-    if (existing) {
-      this.cart.update(prev => prev.map(i => i.id === cartItemId ? { ...i, quantity: i.quantity + data.quantity } : i));
-    } else {
-      this.cart.update(prev => [...prev, {
-        id: cartItemId, name: product.name, price: finalPrice,
-        quantity: data.quantity,
-        image: product.mainImage, size: data.size
-      }]);
+    // Obtenemos el stock si no viene en el evento, por seguridad
+    let stock = data.stock;
+    if (stock === undefined) {
+      stock = product.sizes.find(s => s.size === data.size)?.stock || 0;
     }
 
-    this.selectedProduct.set(null);
-    this.openCart();
+    this.processAddToCart(product, data.size, data.quantity, stock);
   }
 
-  private addItemToCart(product: Product, size: string) {
+  private processAddToCart(product: Product, size: string, quantity: number, stock: number) {
     const finalPrice = product.discount ? product.price * (1 - product.discount / 100) : product.price;
+    // Identificador único para el servicio (aunque el servicio lo maneja por separado)
     const cartItemId = `${product.id}-${size}`;
 
-    const existing = this.cart().find((i) => i.id === cartItemId);
-    if (existing) {
-      this.cart.update(prev => prev.map(i => i.id === cartItemId ? { ...i, quantity: i.quantity + 1 } : i));
-    } else {
-      this.cart.update(prev => [...prev, {
-        id: cartItemId, name: product.name, price: finalPrice,
-        quantity: 1, image: product.mainImage, size: size
-      }]);
+    const success = this.cartService.addItem({
+      id: cartItemId, // El ID que usa el componente visual
+      name: product.name,
+      price: finalPrice,
+      image: product.mainImage,
+      size: size,
+      quantity: quantity,
+      stock: stock // ✅ Pasamos el stock al servicio para validaciones futuras
+    });
+
+    if (success) {
+      // Sincronizamos la señal local con el servicio
+      this.cart.set([...this.cartService.items]);
+
+      // Si veníamos del detalle, lo cerramos
+      this.selectedProduct.set(null);
+      this.openCart();
     }
   }
 
-  updateQuantity(event: { id: string; quantity: number }) {
-    this.cart.update((prev) => prev.map((i) => i.id === event.id ? { ...i, quantity: event.quantity } : i));
+  // Actualizar cantidad desde el carrito
+  updateQuantity(event: { id: string; quantity: number; size?: string }) {
+    // Nota: El shopping-cart emite 'id' que es el item.id (que es `productId-size`).
+    // Pero el servicio espera id y size separados si usamos mi lógica anterior, 
+    // OJO: En tu ShoppingCartComponent, item.id ya es "ID-SIZE" si lo creamos así en processAddToCart.
+    // Para simplificar, como addItem usa item.id como identificador único en el array del servicio:
+
+    // Ajuste al servicio para que funcione con tu estructura actual:
+    // Buscamos el item en el servicio que coincida con el ID del evento.
+    const item = this.cartService.items.find(i => i.id === event.id);
+    if (item) {
+      // Llamamos a updateQuantity pasando los datos necesarios
+      // Como 'id' en el array ya es único, usamos ese mismo para buscar
+      this.cartService.updateQuantity(event.id, item.size, event.quantity); // updateQuantity corregido abajo
+      this.cart.set([...this.cartService.items]);
+    }
   }
+
+  // Eliminar desde el carrito
   removeItem(event: { id: string; size?: string }) {
-    const id = event.id;
-    this.cart.update((prev) => prev.filter((i) => i.id !== id));
+    // El servicio necesita saber qué borrar.
+    const item = this.cartService.items.find(i => i.id === event.id);
+    if (item) {
+      this.cartService.removeItem(event.id, item.size);
+      this.cart.set([...this.cartService.items]);
+    }
   }
 
   // ADMIN

@@ -14,8 +14,9 @@ export class ShoppingCartComponent {
     @Input() items: CartItem[] = [];
 
     @Output() close = new EventEmitter<void>();
-    @Output() updateQuantity = new EventEmitter<{ id: string; quantity: number; size?: string }>();
-    @Output() removeItem = new EventEmitter<{ id: string; size?: string }>();
+    // ✅ Size ahora es obligatorio
+    @Output() updateQuantity = new EventEmitter<{ id: string; quantity: number; size: string }>();
+    @Output() removeItem = new EventEmitter<{ id: string; size: string }>();
 
     get subtotal(): number {
         return this.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -35,6 +36,13 @@ export class ShoppingCartComponent {
 
     changeQuantity(item: CartItem, newQty: number): void {
         if (newQty < 1) return;
+
+        // ✅ Validación: No permitir subir más allá del stock
+        if (newQty > item.stock) {
+            // Opcional: alert('Stock máximo alcanzado');
+            return;
+        }
+
         this.updateQuantity.emit({ id: item.id, quantity: newQty, size: item.size });
     }
 
@@ -42,22 +50,16 @@ export class ShoppingCartComponent {
         this.removeItem.emit({ id: item.id, size: item.size });
     }
 
-    // ✅ FUNCIÓN WHATSAPP
     initiateCheckout() {
         if (this.items.length === 0) return;
-
-        // REEMPLAZA ESTE NÚMERO POR EL TUYO (Formato internacional sin +)
+        // ... (Tu lógica de WhatsApp queda igual)
         const phoneNumber = "5491135172352";
-
         let message = "Hola BREATHE, quiero iniciar una compra:\n\n";
-
         this.items.forEach(item => {
-            message += `• ${item.name} | Talle: ${item.size || 'Único'} | Cant: ${item.quantity} | $${item.price * item.quantity}\n`;
+            message += `• ${item.name} | Talle: ${item.size} | Cant: ${item.quantity} | $${item.price * item.quantity}\n`;
         });
-
         message += `\n*Total Final: $${this.total}*`;
         message += "\n\nEspero confirmación para coordinar el pago y envío.";
-
         const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
     }

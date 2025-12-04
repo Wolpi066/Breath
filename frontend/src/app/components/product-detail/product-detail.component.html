@@ -25,24 +25,40 @@
                 <div class="sizes-grid">
                     @for (s of product.sizes; track s.size) {
                     <button class="size-btn" [class.selected]="selectedSize() === s.size" [disabled]="s.stock === 0"
-                        [class.disabled]="s.stock === 0" (click)="selectedSize.set(s.size)">{{ s.size }}</button>
+                        [class.disabled]="s.stock === 0" (click)="selectedSize.set(s.size); quantity.set(1)">
+                        {{ s.size }}
+                    </button>
                     }
                 </div>
-                @if (selectedSize()) { <p class="stock-info">Stock: {{ getStock(selectedSize()!) }}</p> }
+
+                @if (selectedSize()) {
+                <p class="stock-info">
+                    Stock Total: {{ getStock(selectedSize()!) }}
+                    @if (effectiveStock < getStock(selectedSize()!)) { <span
+                        style="color: #e74c3c; font-size: 0.9em; margin-left: 5px;">
+                        (Tienes {{ getStock(selectedSize()!) - effectiveStock }} en tu carrito)
+                        </span>
+                        }
+                </p>
+                }
 
                 <div class="actions-row" style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <div class="qty-control"
                         style="display: flex; border: 1px solid #ccc; height: 48px; align-items: center;">
-                        <button (click)="decrementQty()"
+
+                        <button (click)="decrementQty()" [disabled]="quantity() <= 1"
                             style="width: 40px; height: 100%; border: none; background: none; cursor: pointer; font-size: 16px;">-</button>
+
                         <span style="min-width: 30px; text-align: center; font-size: 14px;">{{ quantity() }}</span>
-                        <button (click)="incrementQty()"
+
+                        <button (click)="incrementQty()" [disabled]="!selectedSize() || quantity() >= effectiveStock"
+                            [style.opacity]="(!selectedSize() || quantity() >= effectiveStock) ? 0.3 : 1"
                             style="width: 40px; height: 100%; border: none; background: none; cursor: pointer; font-size: 16px;">+</button>
                     </div>
 
-                    <button class="add-btn" [disabled]="!selectedSize()" (click)="onAddToCartClick()"
-                        style="flex: 1; margin-bottom: 0; height: 48px;">
-                        AGREGAR AL CARRITO
+                    <button class="add-btn" [disabled]="!selectedSize() || effectiveStock === 0"
+                        (click)="onAddToCartClick()" style="flex: 1; margin-bottom: 0; height: 48px;">
+                        {{ (effectiveStock === 0 && selectedSize()) ? 'SIN STOCK DISPONIBLE' : 'AGREGAR AL CARRITO' }}
                     </button>
                 </div>
 

@@ -34,7 +34,13 @@
                             <div class="qty-control">
                                 <button (click)="changeQuantity(item, item.quantity - 1)">-</button>
                                 <span>{{ item.quantity }}</span>
-                                <button (click)="changeQuantity(item, item.quantity + 1)">+</button>
+
+                                <button (click)="changeQuantity(item, item.quantity + 1)"
+                                    [disabled]="item.quantity >= item.stock"
+                                    [style.opacity]="item.quantity >= item.stock ? 0.3 : 1"
+                                    title="Stock máximo alcanzado">
+                                    +
+                                </button>
                             </div>
                             <p class="item-price">{{ item.price * item.quantity | currency:'USD':'symbol':'1.0-0' }}</p>
                         </div>
