@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/AuthController.php';
+// Aseguramos que ApiResponse esté cargado (aunque index.php ya lo carga, esto es buena práctica)
+require_once __DIR__ . '/../helpers/ApiResponse.php';
 
 class AdminController
 {
@@ -14,43 +16,40 @@ class AdminController
 
     public function processRequest($action = null)
     {
-        // 1. Verificación de Seguridad
+        // 1. Verificación de Seguridad: Solo ADMIN puede resetear
         $auth = new AuthController($this->db, $this->requestMethod);
         $user = $auth->validateToken();
 
         if (!$user || $user->role !== 'admin') {
-            header("HTTP/1.1 403 Forbidden");
-            echo json_encode(["error" => "Acceso denegado."]);
-            return;
+            ApiResponse::error("Acceso denegado. Se requiere rol de Admin.", 403);
         }
 
-        // 2. Rutas
+        // 2. Rutas del controlador
         if ($action === 'reset-db' && $this->requestMethod == 'POST') {
             $this->resetDatabase();
         } else {
-            header("HTTP/1.1 404 Not Found");
-            echo json_encode(["error" => "Acción no encontrada"]);
+            ApiResponse::error("Acción no encontrada", 404);
         }
     }
 
     private function resetDatabase()
     {
         try {
-            // Habilitar múltiples queries para la estructura masiva
+            // Habilitar ejecución de múltiples queries para el script masivo
             $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
 
-            // PASO 1: BORRAR Y CREAR TABLAS + PRODUCTOS (Sin el usuario admin aún)
+            // SQL DE ESTRUCTURA Y DATOS BASE (Optimizado con Índices)
             $sqlStructure = <<<'SQL'
                 SET FOREIGN_KEY_CHECKS = 0;
 
-                -- LIMPIEZA
+                -- 1. LIMPIEZA
                 DROP TABLE IF EXISTS `reviews`;
                 DROP TABLE IF EXISTS `product_variants`;
                 DROP TABLE IF EXISTS `products`;
                 DROP TABLE IF EXISTS `sizes`;
                 DROP TABLE IF EXISTS `users`;
 
-                -- ESTRUCTURA
+                -- 2. ESTRUCTURA
                 CREATE TABLE `users` (
                   `id` int(11) NOT NULL AUTO_INCREMENT,
                   `username` varchar(50) NOT NULL,
@@ -71,7 +70,9 @@ class AdminController
                   `main_image` varchar(255) NOT NULL,
                   `hover_image` varchar(255) DEFAULT NULL,
                   `created_at` timestamp DEFAULT current_timestamp(),
-                  PRIMARY KEY (`id`)
+                  PRIMARY KEY (`id`),
+                  INDEX `idx_category` (`category`), -- ⚡ Optimización para filtros
+                  INDEX `idx_name` (`name`)          -- ⚡ Optimización para búsquedas
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                 CREATE TABLE `sizes` (
@@ -104,7 +105,7 @@ class AdminController
                   CONSTRAINT `fk_reviews_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                -- DATOS BASE
+                -- 3. DATOS DE EJEMPLO
                 INSERT INTO `sizes` (`id`, `name`) VALUES (1,'S'), (2,'M'), (3,'L'), (4,'XL'), (5,'XXL'), (6,'Única');
 
                 INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `discount`, `main_image`, `hover_image`) VALUES
@@ -137,37 +138,37 @@ class AdminController
 SQL;
             $this->db->exec($sqlStructure);
 
-            // PASO 2: CREAR ADMIN CON CONTRASEÑA REAL (Generada al momento)
-            // Esto garantiza que "admin123" sea la contraseña válida
-            $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
+            // PASO 2: CREAR ADMIN CON CONTRASEÑA SEGURA (Leída desde .env)
+            // Si no existe la variable en el entorno, usamos un fallback seguro
+            $defaultPass = getenv('DEFAULT_ADMIN_PASS') ?: 'Admin_Generico_123';
+
+            // Generamos el hash dinámicamente
+            $adminPassHash = password_hash($defaultPass, PASSWORD_DEFAULT);
 
             $sqlUser = "INSERT INTO users (username, email, password, role) VALUES (:user, :email, :pass, :role)";
             $stmt = $this->db->prepare($sqlUser);
             $stmt->execute([
                 ':user' => 'admin',
                 ':email' => 'admin@breathe.com',
-                ':pass' => $adminPassword,
+                ':pass' => $adminPassHash,
                 ':role' => 'admin'
             ]);
 
-            // Restaurar configuración
+            // Restaurar configuración y limpiar imágenes
             $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
-
-            // PASO 3: LIMPIAR IMÁGENES
             $this->cleanUploadsFolder();
 
-            header("HTTP/1.1 200 OK");
-            echo json_encode(["message" => "Base de datos reseteada. Admin restaurado (pass: admin123)."]);
+            ApiResponse::send(["message" => "DB Reseteada Exitosamente. Admin restaurado."]);
 
         } catch (PDOException $e) {
-            header("HTTP/1.1 500 Internal Server Error");
-            echo json_encode(["error" => "Error SQL: " . $e->getMessage()]);
+            ApiResponse::error("Error SQL al resetear: " . $e->getMessage());
         }
     }
 
     private function cleanUploadsFolder()
     {
         $folder = __DIR__ . '/../uploads/products/';
+
         if (!is_dir($folder))
             return;
 

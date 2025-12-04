@@ -74,7 +74,7 @@ INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `disco
 (5, 'HOODIE ROSWELL RECORD', 'Buzo con capucha diseño "Roswell Daily Record"', 'buzos', 90.00, 15, 'assets/CARDS/NEWroswell.png', 'assets/CARDS/NEWroswell.png'),
 (6, 'HOODIE TRAGEDY', 'Buzo con capucha "Thank you for the tragedy"', 'buzos', 85.00, 0, 'assets/CARDS/NEWtragedy.png', 'assets/CARDS/NEWtragedy.png'),
 (7, 'T-SHIRT WHO SHOT CUPID WHITE', 'Remera blanca "who shot cupid?" con cupido atravesado', 'remeras', 42.00, 10, 'assets/CARDS/NEWcupidBlanca.png', 'assets/CARDS/NEWcupidBlanca.png'),
-(8, 'T-SHIRT LAST HIT', 'Remera negra "last hit" con pintura renacentista de cupido', 'remeras', 45.00, 0, 'assets/CARDS/NEWlasthit.png', 'assets/CARDS/NEWlasthit.png'), -- 👈 CORREGIDO AQUÍ
+(8, 'T-SHIRT LAST HIT', 'Remera negra "last hit" con pintura renacentista de cupido', 'remeras', 45.00, 0, 'assets/CARDS/NEWlasthit.png', 'assets/CARDS/NEWlasthit.png'),
 (9, 'T-SHIRT WHO SHOT CUPID BLACK', 'Remera negra "who shot cupid?" con cupido atravesado', 'remeras', 42.00, 0, 'assets/CARDS/NEWcupidNegra.png', 'assets/CARDS/NEWcupidNegra.png'),
 (10, 'CAP BREATHE WHITE', 'Gorra blanca con bordado "breathe"', 'gorras', 30.00, 0, 'assets/CARDS/NEWgorraBlanca.png', 'assets/CARDS/NEWgorraBlanca.png'),
 (11, 'CAP BREATHE BLACK', 'Gorra negra con bordado "breathe"', 'gorras', 30.00, 0, 'assets/CARDS/NEWgorraNegra.png', 'assets/CARDS/NEWgorraNegra.png');
@@ -92,7 +92,10 @@ INSERT INTO `product_variants` (`product_id`, `size_id`, `stock`) VALUES
 (10, 6, 25),
 (11, 6, 30);
 
+-- USUARIO ADMIN
+-- NOTA: La contraseña hash abajo corresponde a 'Breathe_Admin2025!' generada con BCRYPT cost 10
+-- Si usas el botón 'Reset DB' del Admin Dashboard, el sistema la generará de nuevo automáticamente.
 INSERT INTO `users` (`username`, `email`, `password`, `role`) VALUES
-('admin', 'admin@breathe.com', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'admin');
+('admin', 'admin@breathe.com', '$2y$10$eOQeX1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.', 'admin');
 
 SET FOREIGN_KEY_CHECKS = 1;

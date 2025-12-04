@@ -32,7 +32,6 @@ class Review
     // --- OBTENER POR PRODUCTO ---
     public function getByProduct($productId)
     {
-        // JOIN para traer el nombre del usuario
         $query = "SELECT r.id, r.user_id, r.rating, r.comment, r.created_at, u.username 
                   FROM " . $this->table_name . " r
                   JOIN users u ON r.user_id = u.id
@@ -46,13 +45,19 @@ class Review
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- OBTENER UNA SOLA (Para verificar propiedad) ---
+    /**
+     * Obtener una reseña por ID
+     * @param int|string $id
+     * @return array|false Devuelve el array de datos o false si no existe
+     */
     public function getOne($id)
     {
         $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
+
+        // El return explícito aquí soluciona el error PHP1408
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
