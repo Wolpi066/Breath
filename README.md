@@ -1,9 +1,3 @@
-¡De una! Acá tenés un README.md listo para copiar y pegar.
-
-Le di ese toque de "estudiante avanzado que sabe lo que hace pero no es un robot corporativo". Está escrito en plural, con jerga técnica correcta y ese tono semi-formal argentino (educado, directo, pero con "onda").
-
-Además, destaqué mucho los puntos fuertes que logramos (seguridad, arquitectura y signals) para que quien lo corrija vea que le metieron cabeza.
-
 🛒 Breath Shop - E-commerce Full Stack
 ¡Bienvenidos al repositorio de Breath Shop! 👋
 
