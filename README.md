@@ -11,7 +11,7 @@ Elegimos un stack sólido para demostrar dominio tanto en cliente como en servid
 Frontend 🎨
 Angular 17+: Usamos las últimas features como Signals y Standalone Components para un manejo de estado reactivo y performante.
 
-Tailwind CSS: Para un diseño moderno y responsive.
+CSS: Para un diseño moderno y responsive.
 
 TypeScript: Tipado estricto para evitar errores en tiempo de ejecución.
 
