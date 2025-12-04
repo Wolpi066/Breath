@@ -12,8 +12,11 @@
             }
         </div>
 
-        @if (banners?.banner1) { <div class="banner-container"><img [src]="banners.banner1" alt="Banner Principal"
-                class="banner-img" /></div> }
+        @if (banners.banner1) {
+        <div class="banner-container">
+            <img [src]="banners.banner1" alt="Banner Principal" class="banner-img" />
+        </div>
+        }
 
         <div class="product-grid">
             @for (product of secondRowProducts; track product.id) {
@@ -23,8 +26,11 @@
             }
         </div>
 
-        @if (banners?.banner2) { <div class="banner-container"><img [src]="banners.banner2" alt="Banner Secundario"
-                class="banner-img" /></div> }
+        @if (banners.banner2) {
+        <div class="banner-container">
+            <img [src]="banners.banner2" alt="Banner Secundario" class="banner-img" />
+        </div>
+        }
 
         @if (remainingProducts.length > 0) {
         <div class="product-grid">

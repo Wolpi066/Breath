@@ -96,6 +96,6 @@ INSERT INTO `product_variants` (`product_id`, `size_id`, `stock`) VALUES
 -- NOTA: La contraseña hash abajo corresponde a 'Breathe_Admin2025!' generada con BCRYPT cost 10
 -- Si usas el botón 'Reset DB' del Admin Dashboard, el sistema la generará de nuevo automáticamente.
 INSERT INTO `users` (`username`, `email`, `password`, `role`) VALUES
-('admin', 'admin@breathe.com', '$2y$10$eOQeX1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.G/X1.', 'admin');
+('admin', 'admin@breathe.com', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'admin');
 
 SET FOREIGN_KEY_CHECKS = 1;
