@@ -22,7 +22,7 @@ export class MinimalProductCardComponent implements OnChanges {
     @Input() installments = 3;
 
     @Output() addToCart = new EventEmitter<string>();
-    @Output() cardClick = new EventEmitter<string>(); // NUEVO: Click en la tarjeta
+    @Output() cardClick = new EventEmitter<string>();
 
     currentImage: string = '';
     fallbackImage = 'assets/CARDS/NEWstfu.png';
@@ -41,7 +41,7 @@ export class MinimalProductCardComponent implements OnChanges {
 
     // Click en el botón "COMPRAR"
     onAddToCartClick(event: Event): void {
-        event.stopPropagation(); // Evita abrir el detalle
+        event.stopPropagation();
         this.addToCart.emit(this.id);
     }
 

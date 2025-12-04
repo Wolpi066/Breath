@@ -22,7 +22,7 @@ export class AuthModalComponent {
     password = '';
     email = '';
     error = '';
-    successMessage = ''; // ✅ Nuevo estado para feedback positivo
+    successMessage = '';
 
     toggleMode() {
         this.mode.set(this.mode() === 'login' ? 'register' : 'login');
@@ -31,22 +31,21 @@ export class AuthModalComponent {
 
     resetForm() {
         this.error = '';
-        this.successMessage = ''; // Limpiamos éxito también
+        this.successMessage = '';
         this.username = '';
         this.password = '';
         this.email = '';
     }
 
-    // ✅ Método llamado por el padre cuando el registro sale bien
     showRegisterSuccess() {
-        this.mode.set('login'); // Cambiar a login
-        this.resetForm(); // Limpiar campos
-        this.successMessage = 'Cuenta creada con éxito. Inicia sesión.'; // Mostrar mensaje
+        this.mode.set('login');
+        this.resetForm();
+        this.successMessage = 'Cuenta creada con éxito. Inicia sesión.';
     }
 
     onSubmit() {
         this.error = '';
-        this.successMessage = ''; // Limpiar mensaje previo al intentar de nuevo
+        this.successMessage = '';
 
         if (this.mode() === 'login') {
             if (!this.username || !this.password) {

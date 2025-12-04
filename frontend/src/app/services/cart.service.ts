@@ -15,12 +15,12 @@ export class CartService {
     open(): void { this.isOpen = true; }
     close(): void { this.isOpen = false; }
 
-    // ✅ Busca un item específico por ID y Talle
+    // Busca un item específico por ID y Talle
     private findItem(id: string, size: string) {
         return this.items.find(i => i.id === id && i.size === size);
     }
 
-    // ✅ Obtiene cuántos hay en el carrito de un producto/talle específico
+    // Obtiene cuántos hay en el carrito de un producto/talle específico
     getQuantityInCart(id: string, size: string): number {
         const item = this.findItem(id, size);
         return item ? item.quantity : 0;
@@ -30,12 +30,12 @@ export class CartService {
         const quantityToAdd = item.quantity ?? 1;
         const existingItem = this.findItem(item.id, item.size);
 
-        // Validación de seguridad: Verificar stock total
+        // Verificar stock total
         const currentQty = existingItem ? existingItem.quantity : 0;
 
         if (currentQty + quantityToAdd > item.stock) {
             alert(`No hay suficiente stock. Stock máx: ${item.stock}, En carrito: ${currentQty}`);
-            return false; // Indica que falló
+            return false;
         }
 
         if (existingItem) {
@@ -46,7 +46,7 @@ export class CartService {
                 quantity: quantityToAdd,
             });
         }
-        return true; // Éxito
+        return true;
     }
 
     updateQuantity(id: string, size: string, quantity: number): void {
@@ -58,16 +58,15 @@ export class CartService {
             return;
         }
 
-        // ✅ Validación estricta de stock
+        // Validación estricta de stock
         if (quantity > item.stock) {
             alert(`Lo sentimos, solo hay ${item.stock} unidades disponibles en este talle.`);
-            item.quantity = item.stock; // Lo forzamos al máximo posible
+            item.quantity = item.stock;
         } else {
             item.quantity = quantity;
         }
     }
 
-    // ✅ Ahora requiere size para borrar el item correcto
     removeItem(id: string, size: string): void {
         this.items = this.items.filter(i => !(i.id === id && i.size === size));
     }

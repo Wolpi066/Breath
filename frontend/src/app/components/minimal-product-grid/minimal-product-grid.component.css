@@ -22,11 +22,10 @@
     margin: 0;
 }
 
-/* --- CONTENEDOR (Full Bleed / Sin Márgenes) --- */
+/* --- CONTENEDOR --- */
 .grid-wrapper {
     width: 100%;
     padding: 0;
-    /* Sin márgenes laterales */
     box-sizing: border-box;
 }
 
@@ -35,16 +34,14 @@
     display: grid;
     width: 100%;
 
-    /* Mobile: 2 Columnas */
     grid-template-columns: repeat(2, 1fr);
 
-    /* Espaciado */
     gap: 48px 12px;
 
     margin-bottom: 64px;
 }
 
-/* Desktop: 4 Columnas Exactas */
+/* Desktop 4 Columnas */
 @media (min-width: 1024px) {
     .product-grid {
         grid-template-columns: repeat(4, 1fr);

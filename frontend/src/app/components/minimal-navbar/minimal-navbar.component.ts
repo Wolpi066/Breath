@@ -17,7 +17,7 @@ export class MinimalNavbarComponent {
     @Output() authClick = new EventEmitter<void>();
     @Output() navigate = new EventEmitter<'home' | 'productos' | 'contacto' | 'about'>();
 
-    // ✅ NUEVO: Evento para emitir la búsqueda al padre
+    // Evento para emitir la búsqueda al padre
     @Output() search = new EventEmitter<string>();
 
     isMenuOpen = false;
@@ -40,7 +40,6 @@ export class MinimalNavbarComponent {
     toggleSearch() {
         this.isSearchOpen = !this.isSearchOpen;
         if (this.isSearchOpen) this.isMenuOpen = false;
-        // Limpiar si cerramos
         if (!this.isSearchOpen) this.onSearch('');
     }
 
@@ -53,7 +52,7 @@ export class MinimalNavbarComponent {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ✅ Método para emitir
+    // Método para emitir
     onSearch(term: string) {
         this.search.emit(term);
     }

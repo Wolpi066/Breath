@@ -3,10 +3,8 @@
     width: 100%;
     min-height: 100vh;
     background-color: #f8f8f8;
-    /* Fondo gris muy suave */
     color: black;
     box-sizing: border-box;
-    /* Padding superior para que no quede tapado por el Navbar principal */
     padding-top: 84px;
     padding-bottom: 80px;
     display: flex;
@@ -34,7 +32,6 @@
     background-color: white;
     position: sticky;
     top: 64px;
-    /* Se pega debajo del navbar principal */
     z-index: 90;
 }
 
@@ -91,7 +88,6 @@
     padding: 0 40px;
     position: sticky;
     top: 137px;
-    /* Ajustado para quedar debajo del header admin */
     z-index: 80;
 }
 
@@ -122,7 +118,6 @@
 .products-layout {
     display: grid;
     grid-template-columns: 360px 1fr;
-    /* Formulario fijo, Lista flexible */
     gap: 60px;
     padding: 40px;
     align-items: start;
@@ -137,7 +132,6 @@
 /* --- FORMULARIO --- */
 .form-section {
     background-color: white;
-    /* Sticky para acompañar el scroll si la lista es larga */
     position: sticky;
     top: 200px;
 }

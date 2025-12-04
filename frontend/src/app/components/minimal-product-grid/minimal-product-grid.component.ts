@@ -20,31 +20,22 @@ export class MinimalProductGridComponent {
 
     // --- LÓGICA DE DISTRIBUCIÓN PERSONALIZADA ---
 
-    // FILA 2 (PRIORIDAD): Solo Remeras (4 unidades)
     get secondRowProducts() {
-        // Filtramos solo las remeras
         const remeras = this.adminProducts.filter(p => p.category.toLowerCase() === 'remeras');
-        // Devolvemos las 4 primeras (más nuevas)
         return remeras.slice(0, 4);
     }
 
-    // FILA 1: Últimos Lanzamientos (SIN Remeras)
     get firstRowProducts() {
-        // Filtramos todo lo que NO sea remera
         const nonRemeras = this.adminProducts.filter(p => p.category.toLowerCase() !== 'remeras');
-        // Devolvemos los 4 primeros (más nuevos)
         return nonRemeras.slice(0, 4);
     }
 
-    // RESTO: Todo lo que sobró (Remeras extra + Otros extra)
     get remainingProducts() {
-        // Obtenemos los IDs que ya mostramos en las filas 1 y 2
         const shownIds = [
             ...this.firstRowProducts.map(p => p.id),
             ...this.secondRowProducts.map(p => p.id)
         ];
 
-        // Devolvemos todo lo que no esté en esa lista de IDs
         return this.adminProducts.filter(p => !shownIds.includes(p.id));
     }
 

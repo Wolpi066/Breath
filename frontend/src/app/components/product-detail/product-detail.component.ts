@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '../../models/product.model';
 import { Review } from '../../models/review.model';
 import { ReviewService } from '../../services/review.service';
-import { CartService } from '../../services/cart.service'; // ✅ Importamos
+import { CartService } from '../../services/cart.service';
 
 @Component({
     selector: 'app-product-detail',
@@ -15,15 +15,13 @@ import { CartService } from '../../services/cart.service'; // ✅ Importamos
 })
 export class ProductDetailComponent implements OnChanges {
     private reviewService = inject(ReviewService);
-    private cartService = inject(CartService); // ✅ Inyectamos
+    private cartService = inject(CartService);
 
     @Input({ required: true }) product!: Product;
     @Input() currentUser: string | null = null;
 
     @Output() close = new EventEmitter<void>();
-    // Nota: Ya no necesitamos emitir el evento al padre para agregar, 
-    // lo podemos hacer directo o mantener el evento si tu arquitectura lo requiere. 
-    // Para no romper tu estructura, mantengo el emit pero validamos antes.
+
     @Output() addToCart = new EventEmitter<{ id: string, size: string, quantity: number, stock: number }>();
     @Output() openCart = new EventEmitter<void>();
     @Output() openAuth = new EventEmitter<void>();
@@ -48,8 +46,7 @@ export class ProductDetailComponent implements OnChanges {
         }
     }
 
-    // ✅ Lógica inteligente de stock
-    // Retorna cuánto stock REAL queda disponible descontando lo que ya tienes en el carrito
+    // Lógica inteligente de stock
     get effectiveStock(): number {
         const size = this.selectedSize();
         if (!size) return 0;
@@ -60,18 +57,17 @@ export class ProductDetailComponent implements OnChanges {
         return Math.max(0, totalStock - inCart);
     }
 
-    // ✅ Validar incremento
+    // Validar incremento
     incrementQty() {
         if (this.quantity() < this.effectiveStock) {
             this.quantity.update(q => q + 1);
         } else {
-            // Opcional: Feedback visual o sonoro de "tope alcanzado"
+            // Posible implementacion sonora de tope alcanzado
         }
     }
 
     decrementQty() { this.quantity.update(q => (q > 1 ? q - 1 : 1)); }
 
-    // Este metodo es solo para visualización bruta del stock total
     getStock(size: string): number {
         return this.product.sizes.find(s => s.size === size)?.stock || 0;
     }
@@ -88,22 +84,20 @@ export class ProductDetailComponent implements OnChanges {
             return;
         }
 
-        // Emitimos incluyendo el stock total para que el carrito lo sepa
         this.addToCart.emit({
             id: this.product.id,
             size: size,
             quantity: this.quantity(),
-            stock: stockTotal // ✅ Pasamos el stock máximo al carrito
+            stock: stockTotal
         });
 
-        // Resetear cantidad a 1 después de agregar (opcional, mejora UX)
         this.quantity.set(1);
         this.openCart.emit();
     }
 
     onLoginClick() { this.openAuth.emit(); }
 
-    // --- LÓGICA DE RESEÑAS (Sin cambios) ---
+    // --- LÓGICA DE RESEÑAS ---
     loadReviews() {
         this.reviewService.getReviews(this.product.id).subscribe({
             next: (data) => this.reviews.set(data),

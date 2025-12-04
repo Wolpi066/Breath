@@ -9,7 +9,6 @@ class Product
         $this->conn = $db;
     }
 
-    // --- LEER TODOS (Ya lo tenías, lo mantengo) ---
     public function getAll()
     {
         $query = "SELECT 
@@ -90,7 +89,6 @@ class Product
 
         } catch (Exception $e) {
             $this->conn->rollBack();
-            // En desarrollo puedes hacer echo $e->getMessage();
             return false;
         }
     }
@@ -125,14 +123,11 @@ class Product
 
             $stmt->execute();
 
-            // 2. Actualizar Talles (Estrategia: Borrar viejos -> Insertar nuevos)
-            // Primero borramos las variantes existentes de este producto
             $delQuery = "DELETE FROM product_variants WHERE product_id = :id";
             $delStmt = $this->conn->prepare($delQuery);
             $delStmt->bindParam(":id", $data['id']);
             $delStmt->execute();
 
-            // Insertamos los nuevos
             if (!empty($data['sizes'])) {
                 $this->insertSizes($data['id'], $data['sizes']);
             }
@@ -149,7 +144,6 @@ class Product
     // --- ELIMINAR PRODUCTO ---
     public function delete($id)
     {
-        // Al borrar el producto, el ON DELETE CASCADE de SQL borrará los talles solos.
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
@@ -162,7 +156,6 @@ class Product
         $query = "SELECT DISTINCT category FROM " . $this->table_name . " ORDER BY category ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        // Devuelve un array simple de strings: ['buzos', 'gorras', ...]
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -173,8 +166,6 @@ class Product
         $stmt = $this->conn->prepare($query);
 
         foreach ($sizes as $sizeObj) {
-            // 1. Buscar el ID del talle en la tabla maestra 'sizes'
-            // (Asumimos que el talle existe, ej: 'S', 'M'. Si no existe, lo ignora o podrías crearlo)
             $sizeName = $sizeObj['size'];
             $stock = $sizeObj['stock'];
 
@@ -185,7 +176,6 @@ class Product
 
             if ($row = $idStmt->fetch(PDO::FETCH_ASSOC)) {
                 $size_id = $row['id'];
-                // 2. Insertar relación
                 $stmt->bindParam(":pid", $product_id);
                 $stmt->bindParam(":sid", $size_id);
                 $stmt->bindParam(":stock", $stock);

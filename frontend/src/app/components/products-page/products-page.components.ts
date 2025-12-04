@@ -24,7 +24,6 @@ export class ProductsPageComponent {
         this._searchSignal.set(value);
     }
 
-    // Este Output se usará para abrir el detalle
     @Output() productClick = new EventEmitter<string>();
 
     selectedCategories = signal<string[]>([]);
@@ -62,7 +61,6 @@ export class ProductsPageComponent {
         this.priceTo.set(null);
     }
 
-    // Emitimos el ID para que el padre abra el detalle
     onCardClick(id: string) {
         this.productClick.emit(id);
     }

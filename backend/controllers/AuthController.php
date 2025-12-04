@@ -1,11 +1,10 @@
 <?php
-// Rutas absolutas para evitar fallos
+
 $models_path = realpath(__DIR__ . '/../models');
 require_once $models_path . '/User.php';
 
 $jwt_file = realpath(__DIR__ . '/../Firebase/JWT/JWT.php');
 if (!$jwt_file) {
-    // Usamos ApiResponse si está disponible, sino json_encode manual
     http_response_code(500);
     die(json_encode(["error" => "Libreria JWT no encontrada"]));
 }
@@ -13,14 +12,13 @@ require_once $jwt_file;
 
 use \Firebase\JWT\JWT;
 
-require_once __DIR__ . '/../helpers/ApiResponse.php'; // Aseguramos tener el helper
+require_once __DIR__ . '/../helpers/ApiResponse.php';
 
 class AuthController
 {
     private $db;
     private $requestMethod;
     private $userModel;
-    // La secret key ya no se guarda aquí como propiedad fija
 
     public function __construct($db, $requestMethod)
     {
@@ -33,7 +31,6 @@ class AuthController
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
-        // Soporte para form-data si fuera necesario, pero priorizamos JSON
         if (empty($input) && !empty($_POST)) {
             $input = $_POST;
         }
@@ -64,7 +61,6 @@ class AuthController
             return false;
 
         try {
-            // ✅ LEER SECRETO DEL ENTORNO
             $secret = getenv('JWT_SECRET');
             if (!$secret)
                 throw new Exception("JWT Secret no configurado");
@@ -86,7 +82,6 @@ class AuthController
 
         // Verificar existencia por username
         if (!$this->userModel->usernameExists()) {
-            // Intentar por email si el username falló
             $this->userModel->email = $data['username'];
             if (!$this->userModel->emailExists()) {
                 ApiResponse::error("Usuario no encontrado", 401);
@@ -94,7 +89,6 @@ class AuthController
         }
 
         if (password_verify($data['password'], $this->userModel->password)) {
-            // ✅ LEER SECRETO DEL ENTORNO
             $secret = getenv('JWT_SECRET');
 
             $payload = array(

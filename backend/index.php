@@ -1,21 +1,17 @@
 <?php
-// 1. Cargar Helpers PRIMERO
+// 1. Cargar Helpers
 require_once 'helpers/EnvLoader.php';
 require_once 'helpers/ApiResponse.php';
 
-// 2. Cargar Entorno INMEDIATAMENTE
+// 2. Cargar Entorno
 try {
     EnvLoader::load(__DIR__ . '/.env');
 } catch (Exception $e) {
-    // En producción esto podría ignorarse o loguearse
     error_log("Error cargando .env: " . $e->getMessage());
 }
 
-// 3. Configurar CORS (Usando la variable de entorno cargada)
-require_once 'config/Cors.php'; // Asegúrate de que Cors.php use getenv('FRONTEND_URL') o lo manejes aquí
-// Nota: Si Cors.php ya tiene la lógica de headers, está bien. 
-// Si no, asegúrate de que use el $origin correcto.
-// Reafirmamos los headers por seguridad si Cors.php no lo hace dinámico:
+// 3. Configurar CORS
+require_once 'config/Cors.php';
 $origin = getenv('FRONTEND_URL') ?: '*';
 header("Access-Control-Allow-Origin: $origin");
 header("Content-Type: application/json; charset=UTF-8");
@@ -27,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit;
 }
 
-// 4. Conectar a Base de Datos (AHORA SÍ, porque ya tenemos las variables)
+// 4. Conectar a Base de Datos
 require_once 'config/Database.php';
 $database = new Database();
 $db = $database->getConnection();
@@ -39,7 +35,7 @@ $path = str_replace($scriptName, '', $requestUri);
 $pathParts = explode('/', trim($path, '/'));
 
 $resource = $pathParts[0] ?? null;
-$subResource = $pathParts[1] ?? null; // ID o acción secundaria
+$subResource = $pathParts[1] ?? null;
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 // Router
@@ -59,7 +55,6 @@ switch ($resource) {
     case 'reviews':
         require_once 'controllers/ReviewController.php';
         $controller = new ReviewController($db, $requestMethod);
-        // Si el subResource es un número, es un ID para borrar. Si no, puede ser null para crear/listar.
         $id = is_numeric($subResource) ? (int) $subResource : null;
         $controller->processRequest($id);
         break;
@@ -67,7 +62,7 @@ switch ($resource) {
     case 'admin':
         require_once 'controllers/AdminController.php';
         $controller = new AdminController($db, $requestMethod);
-        $controller->processRequest($subResource); // 'reset-db'
+        $controller->processRequest($subResource);
         break;
 
     default:

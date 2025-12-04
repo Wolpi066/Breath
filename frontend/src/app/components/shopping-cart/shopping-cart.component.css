@@ -1,4 +1,4 @@
-/* --- OVERLAY (Fondo Oscuro) --- */
+/* --- OVERLAY --- */
 .cart-overlay {
     position: fixed;
     top: 0;
@@ -7,7 +7,6 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
 
-    /* 👇 CAMBIO CLAVE: Valor altísimo para tapar el Navbar */
     z-index: 9998 !important;
 
     cursor: pointer;
@@ -24,7 +23,7 @@
     }
 }
 
-/* --- DRAWER (Panel Lateral) --- */
+/* --- DRAWER --- */
 .cart-drawer {
     position: fixed;
     top: 0;
@@ -34,7 +33,6 @@
     max-width: 400px;
     background-color: white;
 
-    /* 👇 CAMBIO CLAVE: Un punto más que el overlay */
     z-index: 9999 !important;
 
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
@@ -46,9 +44,6 @@
     transform: translateX(0);
 }
 
-/* ... El resto del CSS sigue igual ... */
-/* (Copia el resto del contenido que te pasé antes para cart-content, header, items, etc.) */
-/* --- CONTENIDO INTERNO --- */
 .cart-content {
     display: flex;
     flex-direction: column;
@@ -219,7 +214,7 @@
     letter-spacing: 0.5px;
 }
 
-/* --- FOOTER (Totales) --- */
+/* --- FOOTER --- */
 .cart-footer {
     border-top: 1px solid #eee;
     padding: 24px;
@@ -272,7 +267,6 @@
     width: 100%;
     background: white;
     border: 1px solid black;
-    /* Borde sólido para que parezca botón secundario */
     color: black;
     font-size: 12px;
     letter-spacing: 1px;

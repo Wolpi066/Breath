@@ -10,12 +10,10 @@ import { AuthResponse } from '../models/auth.interface';
 export class AuthService {
     private apiUrl = environment.apiurl + 'auth';
 
-    // Estado reactivo del usuario
     currentUser = signal<string | null>(localStorage.getItem('breath-user'));
 
     constructor(private http: HttpClient) { }
 
-    // Headers con el Token para peticiones privadas
     get authHeaders() {
         const token = localStorage.getItem('breath-token');
         return new HttpHeaders({
@@ -25,7 +23,6 @@ export class AuthService {
 
     // --- ACCIONES ---
 
-    // ✅ Tipado estricto en el retorno
     login(username: string, pass: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { username, password: pass }).pipe(
             tap(response => {
@@ -41,10 +38,8 @@ export class AuthService {
     register(username: string, email: string, pass: string): Observable<any> {
         return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password: pass }).pipe(
             catchError(err => {
-                // Si el backend devuelve HTML (error 500 o warning), lo capturamos
                 console.error("Error registro:", err);
                 if (err.status === 200 && err.error && err.error.text) {
-                    // A veces Angular parsea mal si el PHP devuelve texto plano
                     return throwError(() => new Error("Error inesperado del servidor. Revisa la consola."));
                 }
                 return throwError(() => err);

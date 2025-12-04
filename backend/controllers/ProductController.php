@@ -22,7 +22,6 @@ class ProductController
     {
         $input = json_decode(file_get_contents('php://input'), true);
 
-        // Endpoint especial para categorías
         if ($this->requestMethod === 'GET' && $id === 'categories') {
             $this->getCategories();
             return;
@@ -31,7 +30,7 @@ class ProductController
         switch ($this->requestMethod) {
             case 'GET':
                 if ($id)
-                    ApiResponse::send(["message" => "Detalle pendiente"]); // O implementar getOne
+                    ApiResponse::send(["message" => "Detalle pendiente"]);
                 else
                     $this->getAllProducts();
                 break;
@@ -69,6 +68,12 @@ class ProductController
 
     private function createProduct($data)
     {
+        if (!is_numeric($data['price']) || !is_numeric($data['discount'])) {
+            ApiResponse::error("El precio y el descuento deben ser números.", 400);
+        }
+        if (strlen($data['name']) < 3) {
+            ApiResponse::error("El nombre es muy corto.", 400);
+        }
         if (isset($data['mainImage']))
             $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
         if (isset($data['hoverImage']))
@@ -83,7 +88,7 @@ class ProductController
 
     private function updateProduct($data)
     {
-        $currentProduct = $this->getProductById($data['id']); // Helper interno simple o del modelo
+        $currentProduct = $this->getProductById($data['id']);
 
         if (isset($data['mainImage']) && strpos($data['mainImage'], 'data:image') === 0) {
             $this->imageService->deleteFile($currentProduct['main_image']);

@@ -5,7 +5,6 @@ class ImageService
 
     public function __construct()
     {
-        // Ruta absoluta a uploads
         $this->targetDir = __DIR__ . '/../../uploads/';
     }
 
@@ -31,7 +30,6 @@ class ImageService
         }
 
         file_put_contents($folderPath . $filename, $data);
-        // Devuelve ruta relativa para la DB
         return 'uploads/' . $subfolder . '/' . $filename;
     }
 
@@ -40,11 +38,10 @@ class ImageService
         if (!$relativePath)
             return;
 
-        // Evitar path traversal y asegurar que borramos solo de uploads
         if (strpos($relativePath, 'uploads/') !== 0)
             return;
 
-        $fullPath = $this->targetDir . '../' . $relativePath; // Ajuste de ruta
+        $fullPath = $this->targetDir . '../' . $relativePath;
         if (file_exists($fullPath)) {
             unlink($fullPath);
         }

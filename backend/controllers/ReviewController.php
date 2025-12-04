@@ -75,15 +75,12 @@ class ReviewController
 
     private function deleteReview($reviewId, $user)
     {
-        // Aquí es donde tenías el error. Al corregir el modelo abajo, esto funcionará perfecto.
         $review = $this->reviewModel->getOne($reviewId);
 
         if (!$review) {
             ApiResponse::error("Reseña no encontrada", 404);
         }
 
-        // Verificar si es el dueño de la reseña o es admin
-        // Nota: $user es un objeto (stdClass) porque viene de JWT::decode
         if ($user->role === 'admin' || $user->id == $review['user_id']) {
             if ($this->reviewModel->delete($reviewId)) {
                 ApiResponse::send(["message" => "Reseña eliminada"]);

@@ -14,7 +14,6 @@ export class ShoppingCartComponent {
     @Input() items: CartItem[] = [];
 
     @Output() close = new EventEmitter<void>();
-    // ✅ Size ahora es obligatorio
     @Output() updateQuantity = new EventEmitter<{ id: string; quantity: number; size: string }>();
     @Output() removeItem = new EventEmitter<{ id: string; size: string }>();
 
@@ -37,9 +36,7 @@ export class ShoppingCartComponent {
     changeQuantity(item: CartItem, newQty: number): void {
         if (newQty < 1) return;
 
-        // ✅ Validación: No permitir subir más allá del stock
         if (newQty > item.stock) {
-            // Opcional: alert('Stock máximo alcanzado');
             return;
         }
 
@@ -52,7 +49,6 @@ export class ShoppingCartComponent {
 
     initiateCheckout() {
         if (this.items.length === 0) return;
-        // ... (Tu lógica de WhatsApp queda igual)
         const phoneNumber = "5491135172352";
         let message = "Hola BREATHE, quiero iniciar una compra:\n\n";
         this.items.forEach(item => {

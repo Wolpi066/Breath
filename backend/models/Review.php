@@ -48,7 +48,7 @@ class Review
     /**
      * Obtener una reseña por ID
      * @param int|string $id
-     * @return array|false Devuelve el array de datos o false si no existe
+     * @return array|false
      */
     public function getOne($id)
     {
@@ -57,7 +57,6 @@ class Review
         $stmt->bindParam(':id', $id);
         $stmt->execute();
 
-        // El return explícito aquí soluciona el error PHP1408
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

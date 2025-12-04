@@ -12,7 +12,7 @@
     padding: 0 24px;
 }
 
-/* --- SIDEBAR (Estilos Base) --- */
+/* --- SIDEBAR --- */
 .sidebar {
     width: 250px;
     padding: 0 40px 0 24px;
@@ -148,7 +148,6 @@
     color: #666;
 }
 
-/* --- GRID AREA --- */
 .grid-area {
     flex: 1;
 }
@@ -196,7 +195,7 @@
     text-transform: uppercase;
 }
 
-/* --- ESTILOS MÓVILES (RESTO SE MANTIENE) --- */
+/* --- MÓVILES --- */
 .mobile-controls {
     display: none;
 }
@@ -213,7 +212,6 @@
     display: none;
 }
 
-/* MEDIA QUERY (< 1024px) */
 @media (max-width: 1024px) {
     .content-wrapper {
         flex-direction: column;
@@ -224,7 +222,6 @@
         display: none;
     }
 
-    /* Header Móvil */
     .mobile-controls {
         display: flex;
         justify-content: space-between;
@@ -319,7 +316,6 @@
         z-index: 1999;
     }
 
-    /* Grid Móvil: 2 columnas */
     .products-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 48px 12px;

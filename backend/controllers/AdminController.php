@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/AuthController.php';
-// Aseguramos que ApiResponse esté cargado (aunque index.php ya lo carga, esto es buena práctica)
 require_once __DIR__ . '/../helpers/ApiResponse.php';
 
 class AdminController
@@ -71,8 +70,8 @@ class AdminController
                   `hover_image` varchar(255) DEFAULT NULL,
                   `created_at` timestamp DEFAULT current_timestamp(),
                   PRIMARY KEY (`id`),
-                  INDEX `idx_category` (`category`), -- ⚡ Optimización para filtros
-                  INDEX `idx_name` (`name`)          -- ⚡ Optimización para búsquedas
+                  INDEX `idx_category` (`category`), 
+                  INDEX `idx_name` (`name`)          
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
                 CREATE TABLE `sizes` (
@@ -138,7 +137,7 @@ class AdminController
 SQL;
             $this->db->exec($sqlStructure);
 
-            // PASO 2: CREAR ADMIN CON CONTRASEÑA SEGURA (Leída desde .env)
+            // CREAR ADMIN CON CONTRASEÑA SEGURA (Leída desde .env)
             // Si no existe la variable en el entorno, usamos un fallback seguro
             $defaultPass = getenv('DEFAULT_ADMIN_PASS') ?: 'Admin_Generico_123';
 

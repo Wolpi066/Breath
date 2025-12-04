@@ -5,7 +5,7 @@ class Database
 
     public function __construct()
     {
-        // Asumimos que EnvLoader ya se llamó en index.php
+        //EnvLoader ya se llamó en index.php
     }
 
     public function getConnection()

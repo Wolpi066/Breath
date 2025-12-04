@@ -7,7 +7,7 @@
     height: 64px;
     z-index: 1000;
 
-    /* Estado Base (Transparente) */
+    /* Estado Base */
     background-color: transparent;
     color: white;
     border-bottom: 1px solid transparent;
@@ -15,41 +15,35 @@
 }
 
 /* --- ESTADOS DINÁMICOS --- */
-/* Fondo Sólido (Hover/Menú) - FORZAMOS BLANCO */
 .navbar.navbar-solid {
     background-color: white !important;
     color: black !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Contenido Oscuro (Scroll) */
 .navbar.dark-content {
     color: black;
 }
 
-/* --- LAYOUT FLEX (CORREGIDO) --- */
+/* --- LAYOUT FLEX --- */
 .nav-container {
     display: flex;
     justify-content: space-between;
-    /* Separa Izquierda y Derecha a los extremos */
     align-items: center;
     height: 100%;
     position: relative;
-    /* Referencia para el logo absoluto */
 
-    /* REGLA DE ORO: */
     width: 100%;
     padding: 0 24px;
     box-sizing: border-box;
 }
 
-/* --- LOGO CENTRADO (Absoluto) --- */
+/* --- LOGO CENTRADO --- */
 .nav-center-absolute {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    /* Centrado matemático */
     z-index: 10;
 }
 
@@ -66,11 +60,9 @@
     width: auto;
     display: block;
     filter: none;
-    /* Blanco por defecto */
     transition: filter 0.3s ease;
 }
 
-/* Invertir a negro si el contenido debe ser oscuro */
 .navbar.dark-content .logo-img,
 .navbar.navbar-solid .logo-img {
     filter: invert(1);
@@ -82,12 +74,10 @@
     display: flex;
     align-items: center;
     z-index: 20;
-    /* Encima del logo */
 }
 
 .nav-right {
     gap: 16px;
-    /* Separación entre elementos derechos */
 }
 
 /* --- BOTONES ICONOS --- */
@@ -141,7 +131,7 @@
 }
 
 
-/* --- 🔍 BUSCADOR INLINE (Pastilla Gris) --- */
+/* --- BUSCADOR --- */
 .search-box-inline {
     display: flex;
     align-items: center;
@@ -183,7 +173,7 @@
 }
 
 
-/* --- 🍔 MENÚ DROPDOWN (Lista Blanca) --- */
+/* --- MENÚ DROPDOWN --- */
 .menu-dropdown {
     position: absolute;
     top: 100%;
@@ -243,7 +233,6 @@
     height: 6px;
     border-radius: 50%;
     background-color: white;
-    /* Por defecto en transparente */
 }
 
 /* Invertir color cuando el navbar es oscuro */

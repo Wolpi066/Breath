@@ -134,12 +134,11 @@
     margin: 0;
 }
 
-/* 🟢 BOTÓN ADMIN (Blanco y visible) */
+/* BOTÓN ADMIN */
 .admin-link {
     background: none;
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
-    /* Blanco sólido */
     padding: 2px 8px;
     font-size: 10px;
     letter-spacing: 2px;

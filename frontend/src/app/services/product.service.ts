@@ -12,7 +12,6 @@ import { BannerData } from '../models/banner.model';
 export class ProductService {
     private apiUrl = environment.apiurl + 'products';
     private adminUrl = environment.apiurl + 'admin';
-    // Base URL para imágenes subidas (ajusta si tu carpeta backend está en otro lado)
     private backendBaseUrl = 'http://localhost/Breath/backend/';
 
     private defaultBanners: BannerData = {
@@ -25,10 +24,8 @@ export class ProductService {
         private authService: AuthService
     ) { }
 
-    // Helper para arreglar URLs de imágenes
     private fixImageUrl(url: string): string {
         if (!url) return '';
-        // Si ya es http o assets, la dejamos. Si es uploads/, le pegamos el dominio.
         if (url.startsWith('http') || url.startsWith('assets')) return url;
         return this.backendBaseUrl + url;
     }
@@ -41,7 +38,6 @@ export class ProductService {
                     price: Number(p.price),
                     discount: Number(p.discount),
                     sizes: p.sizes || [],
-                    // Arreglamos las rutas de las imágenes al recibirlas
                     mainImage: this.fixImageUrl(p.mainImage),
                     hoverImage: this.fixImageUrl(p.hoverImage || '')
                 }));
@@ -53,7 +49,6 @@ export class ProductService {
         return this.http.get<string[]>(`${this.apiUrl}/categories`);
     }
 
-    // ... (El resto de métodos CRUD queda igual, ya que envían la info correcta) ...
     createProduct(product: Product): Observable<any> {
         return this.http.post(this.apiUrl, product, { headers: this.authService.authHeaders });
     }

@@ -32,7 +32,7 @@ class User
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->role = htmlspecialchars(strip_tags($this->role));
 
-        // ⚠️ CORRECCIÓN: Hashear la contraseña CRUDA, sin modificarla antes
+        // Hashear la contraseña CRUDA, sin modificarla antes
         $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
 
         // Bindear

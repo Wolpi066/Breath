@@ -11,13 +11,12 @@ export interface Product {
     sizes: ProductSize[];
 
     mainImage: string;
-    image?: string; // Opcional (legacy)
+    image?: string;
 
-    // 👇 AGREGA ESTA LÍNEA AQUÍ
     hoverImage?: string;
 
     discount?: number;
-    salePercentage?: number; // Opcional (legacy)
+    salePercentage?: number;
 
     originalPrice?: number;
     description?: string;

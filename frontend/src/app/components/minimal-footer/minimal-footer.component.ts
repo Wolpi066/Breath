@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
     styleUrls: ['./minimal-footer.component.css']
 })
 export class MinimalFooterComponent {
-    // ✅ NUEVO: Recibe si es admin para mostrar/ocultar botón
+    // Recibe si es admin para mostrar/ocultar botón
     @Input() isAdmin = false;
     @Output() adminClick = new EventEmitter<void>();
 

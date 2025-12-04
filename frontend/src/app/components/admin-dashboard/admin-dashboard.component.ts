@@ -41,12 +41,12 @@ export class AdminDashboardComponent implements OnChanges {
 
     sizesOptions = ['S', 'M', 'L', 'XL', 'XXL', 'Única'];
 
-    categoriesOptions = signal<string[]>([]); // Usar signal para reactividad
+    categoriesOptions = signal<string[]>([]);
 
     ngOnInit() {
         this.productService.getCategories().subscribe({
             next: (cats) => this.categoriesOptions.set(cats),
-            error: () => this.categoriesOptions.set(['remeras', 'buzos', 'otros']) // Fallback
+            error: () => this.categoriesOptions.set(['remeras', 'buzos', 'otros'])
         });
     }
 
