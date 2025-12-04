@@ -1,21 +1,26 @@
 <?php
-// Rutas absolutas para evitar fallos en Windows/XAMPP
+// Rutas absolutas para evitar fallos
 $models_path = realpath(__DIR__ . '/../models');
 require_once $models_path . '/User.php';
 
 $jwt_file = realpath(__DIR__ . '/../Firebase/JWT/JWT.php');
-if (!$jwt_file)
-    die(json_encode(["error" => "Libreria JWT no encontrada en: " . __DIR__ . '/../Firebase/JWT/JWT.php']));
+if (!$jwt_file) {
+    // Usamos ApiResponse si está disponible, sino json_encode manual
+    http_response_code(500);
+    die(json_encode(["error" => "Libreria JWT no encontrada"]));
+}
 require_once $jwt_file;
 
 use \Firebase\JWT\JWT;
+
+require_once __DIR__ . '/../helpers/ApiResponse.php'; // Aseguramos tener el helper
 
 class AuthController
 {
     private $db;
     private $requestMethod;
     private $userModel;
-    private $secret_key = "TU_SECRETO_SUPER_SEGURO_BREATH_2025";
+    // La secret key ya no se guarda aquí como propiedad fija
 
     public function __construct($db, $requestMethod)
     {
@@ -26,7 +31,12 @@ class AuthController
 
     public function processRequest()
     {
-        $input = !empty($_POST) ? $_POST : json_decode(file_get_contents('php://input'), true);
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        // Soporte para form-data si fuera necesario, pero priorizamos JSON
+        if (empty($input) && !empty($_POST)) {
+            $input = $_POST;
+        }
 
         if ($this->requestMethod == 'POST') {
             if (isset($input['action']) && $input['action'] == 'register') {
@@ -35,11 +45,10 @@ class AuthController
                 $this->login($input);
             }
         } else {
-            header("HTTP/1.1 405 Method Not Allowed");
+            ApiResponse::error("Método no permitido", 405);
         }
     }
 
-    // --- VALIDAR TOKEN (Simplificado sin clase Key) ---
     public function validateToken()
     {
         $headers = apache_request_headers();
@@ -55,8 +64,12 @@ class AuthController
             return false;
 
         try {
-            // Decodificación compatible con la versión de JWT provista
-            $decoded = JWT::decode($token, $this->secret_key, array('HS256'));
+            // ✅ LEER SECRETO DEL ENTORNO
+            $secret = getenv('JWT_SECRET');
+            if (!$secret)
+                throw new Exception("JWT Secret no configurado");
+
+            $decoded = JWT::decode($token, $secret, array('HS256'));
             return $decoded->data;
         } catch (Exception $e) {
             return false;
@@ -66,27 +79,29 @@ class AuthController
     private function login($data)
     {
         if (!isset($data['username']) || !isset($data['password'])) {
-            header("HTTP/1.1 400 Bad Request");
-            echo json_encode(["error" => "Faltan credenciales"]);
-            return;
+            ApiResponse::error("Faltan credenciales", 400);
         }
 
         $this->userModel->username = $data['username'];
+
+        // Verificar existencia por username
         if (!$this->userModel->usernameExists()) {
+            // Intentar por email si el username falló
             $this->userModel->email = $data['username'];
             if (!$this->userModel->emailExists()) {
-                header("HTTP/1.1 401 Unauthorized");
-                echo json_encode(["error" => "Usuario no encontrado"]);
-                return;
+                ApiResponse::error("Usuario no encontrado", 401);
             }
         }
 
         if (password_verify($data['password'], $this->userModel->password)) {
+            // ✅ LEER SECRETO DEL ENTORNO
+            $secret = getenv('JWT_SECRET');
+
             $payload = array(
-                'iss' => "http://localhost/Breath",
-                'aud' => "http://localhost/Breath",
+                'iss' => getenv('FRONTEND_URL') ?: "http://localhost",
+                'aud' => getenv('FRONTEND_URL') ?: "http://localhost",
                 'iat' => time(),
-                'exp' => time() + (3600 * 24),
+                'exp' => time() + (3600 * 24), // 24 horas
                 'data' => array(
                     'id' => $this->userModel->id,
                     'username' => $this->userModel->username,
@@ -94,10 +109,9 @@ class AuthController
                 )
             );
 
-            $jwt = JWT::encode($payload, $this->secret_key);
+            $jwt = JWT::encode($payload, $secret);
 
-            header("HTTP/1.1 200 OK");
-            echo json_encode([
+            ApiResponse::send([
                 "message" => "Login exitoso",
                 "token" => $jwt,
                 "user" => [
@@ -106,24 +120,25 @@ class AuthController
                 ]
             ]);
         } else {
-            header("HTTP/1.1 401 Unauthorized");
-            echo json_encode(["error" => "Contraseña incorrecta"]);
+            ApiResponse::error("Contraseña incorrecta", 401);
         }
     }
 
     private function register($data)
     {
+        if (!isset($data['username']) || !isset($data['email']) || !isset($data['password'])) {
+            ApiResponse::error("Datos incompletos", 400);
+        }
+
         $this->userModel->username = $data['username'];
         $this->userModel->email = $data['email'];
         $this->userModel->password = $data['password'];
-        $this->userModel->role = 'user';
+        $this->userModel->role = 'user'; // Default
 
         if ($this->userModel->create()) {
-            header("HTTP/1.1 201 Created");
-            echo json_encode(["message" => "Usuario registrado exitosamente"]);
+            ApiResponse::send(["message" => "Usuario registrado exitosamente"], 201);
         } else {
-            header("HTTP/1.1 503 Service Unavailable");
-            echo json_encode(["error" => "Error al registrar. El usuario o email ya existen."]);
+            ApiResponse::error("Error al registrar. Usuario o email ya existen.", 503);
         }
     }
 }

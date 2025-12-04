@@ -28,7 +28,9 @@ CREATE TABLE `products` (
   `main_image` varchar(255) NOT NULL,
   `hover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `idx_category` (`category`),
+  INDEX `idx_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `sizes` (

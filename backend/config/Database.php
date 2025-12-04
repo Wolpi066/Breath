@@ -1,35 +1,35 @@
 <?php
 class Database
 {
-    // Credenciales de conexión
-    private $host = "localhost";
-    private $db_name = "breath_shop";
-    private $username = "breath_admin";
-    private $password = "Breath2025Secure!";
-    public $conn;
+    private $conn;
 
-    // Obtener la conexión a la base de datos
+    public function __construct()
+    {
+        // Asumimos que EnvLoader ya se llamó en index.php
+    }
+
     public function getConnection()
     {
         $this->conn = null;
 
         try {
-            // Crear conexión PDO
+            $host = getenv('DB_HOST');
+            $db_name = getenv('DB_NAME');
+            $username = getenv('DB_USER');
+            $password = getenv('DB_PASS');
+
             $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
-                $this->username,
-                $this->password
+                "mysql:host=" . $host . ";dbname=" . $db_name . ";charset=utf8mb4",
+                $username,
+                $password
             );
-
-            // Configurar el manejo de errores a Excepciones (muy importante para depurar)
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-            // Configurar el modo de fetch por defecto a Array Asociativo
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
         } catch (PDOException $exception) {
-            // En producción, no deberías mostrar el mensaje exacto del error al usuario
-            echo json_encode(["error" => "Error de conexión a la base de datos: " . $exception->getMessage()]);
+            // Error genérico para no revelar detalles de infraestructura
+            error_log("Connection error: " . $exception->getMessage());
+            echo json_encode(["error" => "Error de conexión interno."]);
             exit;
         }
 

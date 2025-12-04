@@ -49,6 +49,10 @@ export class ProductService {
         );
     }
 
+    getCategories(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.apiUrl}/categories`);
+    }
+
     // ... (El resto de métodos CRUD queda igual, ya que envían la info correcta) ...
     createProduct(product: Product): Observable<any> {
         return this.http.post(this.apiUrl, product, { headers: this.authService.authHeaders });

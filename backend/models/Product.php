@@ -156,6 +156,16 @@ class Product
         return $stmt->execute();
     }
 
+    // --- OBTENER CATEGORÍAS ÚNICAS ---
+    public function getCategories()
+    {
+        $query = "SELECT DISTINCT category FROM " . $this->table_name . " ORDER BY category ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        // Devuelve un array simple de strings: ['buzos', 'gorras', ...]
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     // --- HELPER: Insertar Talles ---
     private function insertSizes($product_id, $sizes)
     {

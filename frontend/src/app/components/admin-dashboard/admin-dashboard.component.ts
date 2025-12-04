@@ -39,8 +39,16 @@ export class AdminDashboardComponent implements OnChanges {
     banner1Preview = signal<string | null>(null);
     banner2Preview = signal<string | null>(null);
 
-    categoriesOptions = ['remeras', 'buzos', 'pantalones', 'gorras', 'otro'];
     sizesOptions = ['S', 'M', 'L', 'XL', 'XXL', 'Única'];
+
+    categoriesOptions = signal<string[]>([]); // Usar signal para reactividad
+
+    ngOnInit() {
+        this.productService.getCategories().subscribe({
+            next: (cats) => this.categoriesOptions.set(cats),
+            error: () => this.categoriesOptions.set(['remeras', 'buzos', 'otros']) // Fallback
+        });
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['products']) this.applyFilters();

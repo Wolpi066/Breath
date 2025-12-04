@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment.development';
+import { AuthResponse } from '../models/auth.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -24,10 +25,11 @@ export class AuthService {
 
     // --- ACCIONES ---
 
-    login(username: string, pass: string): Observable<any> {
-        return this.http.post<any>(`${this.apiUrl}/login`, { username, password: pass }).pipe(
+    // ✅ Tipado estricto en el retorno
+    login(username: string, pass: string): Observable<AuthResponse> {
+        return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { username, password: pass }).pipe(
             tap(response => {
-                if (response.token) {
+                if (response.token && response.user) {
                     localStorage.setItem('breath-token', response.token);
                     localStorage.setItem('breath-user', response.user.username);
                     this.currentUser.set(response.user.username);

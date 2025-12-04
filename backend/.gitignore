@@ -1,0 +1,13 @@
+# Seguridad (CRÍTICO)
+.env
+
+# Dependencias de terceros
+vendor/
+
+# Archivos subidos por usuarios
+uploads/
+
+# Logs y sistema
+error_log
+.DS_Store
+Thumbs.db
