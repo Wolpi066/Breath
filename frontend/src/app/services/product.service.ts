@@ -6,6 +6,12 @@ import { Product } from '../models/product.model';
 import { AuthService } from './auth.service';
 import { BannerData } from '../models/banner.model';
 
+// ✅ Interfaz para respuestas estándar del backend
+export interface ApiResponse {
+    message?: string;
+    error?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -49,20 +55,21 @@ export class ProductService {
         return this.http.get<string[]>(`${this.apiUrl}/categories`);
     }
 
-    createProduct(product: Product): Observable<any> {
-        return this.http.post(this.apiUrl, product, { headers: this.authService.authHeaders });
+    // ✅ Tipado estricto en lugar de 'any'
+    createProduct(product: Product): Observable<ApiResponse> {
+        return this.http.post<ApiResponse>(this.apiUrl, product, { headers: this.authService.authHeaders });
     }
 
-    updateProduct(product: Product): Observable<any> {
-        return this.http.put(`${this.apiUrl}/${product.id}`, product, { headers: this.authService.authHeaders });
+    updateProduct(product: Product): Observable<ApiResponse> {
+        return this.http.put<ApiResponse>(`${this.apiUrl}/${product.id}`, product, { headers: this.authService.authHeaders });
     }
 
-    deleteProduct(id: string): Observable<any> {
-        return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.authService.authHeaders });
+    deleteProduct(id: string): Observable<ApiResponse> {
+        return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}`, { headers: this.authService.authHeaders });
     }
 
-    resetDatabase(): Observable<any> {
-        return this.http.post(`${this.adminUrl}/reset-db`, {}, { headers: this.authService.authHeaders });
+    resetDatabase(): Observable<ApiResponse> {
+        return this.http.post<ApiResponse>(`${this.adminUrl}/reset-db`, {}, { headers: this.authService.authHeaders });
     }
 
     getBanners(): BannerData {

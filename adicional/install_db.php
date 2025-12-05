@@ -5,13 +5,13 @@
 require_once 'helpers/EnvLoader.php';
 
 try {
-    if (file_exists(__DIR__ . '/.env')) {
-        EnvLoader::load(__DIR__ . '/.env');
-    } else {
-        die("❌ Error: No se encuentra el archivo .env. Configúralo primero.");
-    }
+  if (file_exists(__DIR__ . '/.env')) {
+    EnvLoader::load(__DIR__ . '/.env');
+  } else {
+    die("❌ Error: No se encuentra el archivo .env. Configúralo primero.");
+  }
 } catch (Exception $e) {
-    die("❌ Error cargando entorno: " . $e->getMessage());
+  die("❌ Error cargando entorno: " . $e->getMessage());
 }
 
 $host = getenv('DB_HOST');
@@ -24,27 +24,27 @@ echo "<h1>🚀 Instalador de Breath Shop</h1>";
 echo "<pre>";
 
 try {
-    // 2. Conectar a MySQL (Sin seleccionar DB aún)
-    echo "Conectando a MySQL... ";
-    $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "OK\n";
+  // 2. Conectar a MySQL (Sin seleccionar DB aún)
+  echo "Conectando a MySQL... ";
+  $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  echo "OK\n";
 
-    // 3. Crear Base de Datos si no existe
-    echo "Verificando base de datos '$dbname'... ";
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    echo "OK (Creada o ya existía)\n";
+  // 3. Crear Base de Datos si no existe
+  echo "Verificando base de datos '$dbname'... ";
+  $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+  echo "OK (Creada o ya existía)\n";
 
-    // 4. Seleccionar la DB
-    $pdo->exec("USE `$dbname`");
+  // 4. Seleccionar la DB
+  $pdo->exec("USE `$dbname`");
 
-    // 5. Estructura de Tablas (SQL)
-    echo "Creando tablas... ";
+  // 5. Estructura de Tablas (SQL)
+  echo "Creando tablas... ";
 
-    // Habilitar multi-query simulado
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
+  // Habilitar multi-query simulado
+  $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
 
-    $sql = <<<'SQL'
+  $sql = <<<'SQL'
         SET FOREIGN_KEY_CHECKS = 0;
         DROP TABLE IF EXISTS `reviews`;
         DROP TABLE IF EXISTS `product_variants`;
@@ -132,35 +132,35 @@ try {
 
         SET FOREIGN_KEY_CHECKS = 1;
 SQL;
-    $pdo->exec($sql);
-    echo "OK (Tablas y productos creados)\n";
+  $pdo->exec($sql);
+  echo "OK (Tablas y productos creados)\n";
 
-    // 6. Insertar Admin
-    echo "Generando usuario Admin... ";
-    // Leemos la contraseña por defecto del .env o usamos la fija
-    $adminPassRaw = getenv('DEFAULT_ADMIN_PASS') ?: 'Breathe_Admin2025!';
-    $adminPassHash = password_hash($adminPassRaw, PASSWORD_DEFAULT);
+  // 6. Insertar Admin
+  echo "Generando usuario Admin... ";
+  // Leemos la contraseña por defecto del .env o usamos la fija
+  $adminPassRaw = getenv('DEFAULT_ADMIN_PASS') ?: 'Breathe_Admin2025!';
+  $adminPassHash = password_hash($adminPassRaw, PASSWORD_DEFAULT);
 
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (:u, :e, :p, :r)");
-    $stmt->execute([
-        ':u' => 'admin',
-        ':e' => 'admin@breathe.com',
-        ':p' => $adminPassHash,
-        ':r' => 'admin'
-    ]);
-    echo "OK\n";
+  $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (:u, :e, :p, :r)");
+  $stmt->execute([
+    ':u' => 'admin',
+    ':e' => 'admin@breathe.com',
+    ':p' => $adminPassHash,
+    ':r' => 'admin'
+  ]);
+  echo "OK\n";
 
-    echo "\n✅ INSTALACIÓN COMPLETADA EXITOSAMENTE\n";
-    echo "----------------------------------------\n";
-    echo "Usuario:    admin\n";
-    echo "Contraseña: $adminPassRaw\n";
-    echo "URL:        $appUrl\n";
-    echo "----------------------------------------\n";
-    echo "IMPORTANTE: Ahora puedes borrar este archivo 'install_db.php'.\n";
-    echo "Hash generado (para guardar en reset.sql si quieres): " . $adminPassHash . "\n";
+  echo "\n✅ INSTALACIÓN COMPLETADA EXITOSAMENTE\n";
+  echo "----------------------------------------\n";
+  echo "Usuario:    admin\n";
+  echo "Contraseña: $adminPassRaw\n";
+  echo "URL:        $appUrl\n";
+  echo "----------------------------------------\n";
+  echo "IMPORTANTE: Ahora puedes borrar este archivo 'install_db.php'.\n";
+  echo "Hash generado (para guardar en reset.sql si quieres): " . $adminPassHash . "\n";
 
 } catch (PDOException $e) {
-    echo "\n❌ ERROR CRÍTICO DE BASE DE DATOS:\n" . $e->getMessage();
+  echo "\n❌ ERROR CRÍTICO DE BASE DE DATOS:\n" . $e->getMessage();
 }
 echo "</pre>";
 ?>

@@ -18,19 +18,19 @@ class ProductController
         $this->imageService = new ImageService();
     }
 
-    public function processRequest($id = null, $subAction = null)
+    public function processRequest($id = null)
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-
         if ($this->requestMethod === 'GET' && $id === 'categories') {
             $this->getCategories();
             return;
         }
 
+        $input = json_decode(file_get_contents('php://input'), true);
+
         switch ($this->requestMethod) {
             case 'GET':
                 if ($id)
-                    ApiResponse::send(["message" => "Detalle pendiente"]);
+                    $this->getProductDetail($id);
                 else
                     $this->getAllProducts();
                 break;
@@ -41,8 +41,9 @@ class ProductController
                 if ($id && $input) {
                     $input['id'] = $id;
                     $this->updateProduct($input);
-                } else
-                    ApiResponse::error("Datos faltantes", 400);
+                } else {
+                    ApiResponse::error("Datos faltantes para actualizar", 400);
+                }
                 break;
             case 'DELETE':
                 if ($id)
@@ -66,30 +67,47 @@ class ProductController
         ApiResponse::send($this->productModel->getCategories());
     }
 
+    private function getProductDetail($id)
+    {
+        $product = $this->productModel->getOne($id);
+        if ($product)
+            ApiResponse::send($product);
+        else
+            ApiResponse::error("Producto no encontrado", 404);
+    }
+
     private function createProduct($data)
     {
-        if (!is_numeric($data['price']) || !is_numeric($data['discount'])) {
-            ApiResponse::error("El precio y el descuento deben ser números.", 400);
-        }
-        if (strlen($data['name']) < 3) {
-            ApiResponse::error("El nombre es muy corto.", 400);
-        }
-        if (isset($data['mainImage']))
-            $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
-        if (isset($data['hoverImage']))
-            $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
+        // 1. Validación de seguridad
+        $this->validateInput($data);
 
+        // 2. Procesamiento de imágenes
+        if (isset($data['mainImage'])) {
+            $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
+        }
+        if (isset($data['hoverImage'])) {
+            $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
+        }
+
+        // 3. Guardado
         if ($this->productModel->create($data)) {
-            ApiResponse::send(["message" => "Creado"], 201);
+            ApiResponse::send(["message" => "Producto creado exitosamente"], 201);
         } else {
-            ApiResponse::error("Error al crear");
+            ApiResponse::error("Error interno al crear el producto");
         }
     }
 
     private function updateProduct($data)
     {
-        $currentProduct = $this->getProductById($data['id']);
+        // 1. Validación de seguridad
+        $this->validateInput($data);
 
+        $currentProduct = $this->getProductById($data['id']);
+        if (!$currentProduct) {
+            ApiResponse::error("Producto no encontrado para actualizar", 404);
+        }
+
+        // 2. Procesamiento de imágenes (Borrar viejas si cambian)
         if (isset($data['mainImage']) && strpos($data['mainImage'], 'data:image') === 0) {
             $this->imageService->deleteFile($currentProduct['main_image']);
             $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
@@ -100,24 +118,45 @@ class ProductController
             $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
         }
 
+        // 3. Actualización
         if ($this->productModel->update($data)) {
-            ApiResponse::send(["message" => "Actualizado"]);
+            ApiResponse::send(["message" => "Producto actualizado exitosamente"]);
         } else {
-            ApiResponse::error("Error al actualizar");
+            ApiResponse::error("Error al actualizar el producto");
         }
     }
 
     private function deleteProduct($id)
     {
         $product = $this->getProductById($id);
+
         if ($this->productModel->delete($id)) {
+            // Borrar archivos físicos
             if ($product) {
                 $this->imageService->deleteFile($product['main_image']);
                 $this->imageService->deleteFile($product['hover_image']);
             }
-            ApiResponse::send(["message" => "Eliminado"]);
+            ApiResponse::send(["message" => "Producto eliminado"]);
         } else {
-            ApiResponse::error("Error al eliminar");
+            ApiResponse::error("Error al eliminar el producto");
+        }
+    }
+
+    // --- Helpers Privados ---
+
+    private function validateInput($data)
+    {
+        if (empty($data['name']) || strlen(trim($data['name'])) < 3) {
+            ApiResponse::error("El nombre es obligatorio y debe tener al menos 3 caracteres.", 400);
+        }
+        if (!isset($data['price']) || !is_numeric($data['price']) || $data['price'] < 0) {
+            ApiResponse::error("El precio es obligatorio y debe ser un número positivo.", 400);
+        }
+        if (isset($data['discount']) && (!is_numeric($data['discount']) || $data['discount'] < 0 || $data['discount'] > 100)) {
+            ApiResponse::error("El descuento debe ser un porcentaje entre 0 y 100.", 400);
+        }
+        if (empty($data['category'])) {
+            ApiResponse::error("La categoría es obligatoria.", 400);
         }
     }
 
