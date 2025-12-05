@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../models/Product.php';
 require_once __DIR__ . '/../services/ImageService.php';
 require_once __DIR__ . '/../helpers/ApiResponse.php';
+require_once __DIR__ . '/AuthController.php';
 
 class ProductController
 {
@@ -20,6 +21,10 @@ class ProductController
 
     public function processRequest($id = null)
     {
+        // Instancia para validar permisos
+        $auth = new AuthController($this->db, $this->requestMethod);
+
+        // Endpoint público para categorías
         if ($this->requestMethod === 'GET' && $id === 'categories') {
             $this->getCategories();
             return;
@@ -34,10 +39,16 @@ class ProductController
                 else
                     $this->getAllProducts();
                 break;
+
             case 'POST':
+                // 🔒 Solo Admin
+                $this->verifyAdmin($auth);
                 $this->createProduct($input);
                 break;
+
             case 'PUT':
+                // 🔒 Solo Admin
+                $this->verifyAdmin($auth);
                 if ($id && $input) {
                     $input['id'] = $id;
                     $this->updateProduct($input);
@@ -45,18 +56,32 @@ class ProductController
                     ApiResponse::error("Datos faltantes para actualizar", 400);
                 }
                 break;
+
             case 'DELETE':
+                // 🔒 Solo Admin
+                $this->verifyAdmin($auth);
                 if ($id)
                     $this->deleteProduct($id);
                 else
                     ApiResponse::error("ID Requerido", 400);
                 break;
+
             default:
                 ApiResponse::error("Método no permitido", 405);
                 break;
         }
     }
 
+    // --- Helper de Seguridad ---
+    private function verifyAdmin($auth)
+    {
+        $user = $auth->validateToken();
+        if (!$user || $user->role !== 'admin') {
+            ApiResponse::error("Acceso denegado. Se requieren permisos de Administrador.", 403);
+        }
+    }
+
+    // --- Lectura (Público) ---
     private function getAllProducts()
     {
         ApiResponse::send($this->productModel->getAll());
@@ -76,12 +101,13 @@ class ProductController
             ApiResponse::error("Producto no encontrado", 404);
     }
 
+    // --- Escritura (Protegido) ---
     private function createProduct($data)
     {
-        // 1. Validación de seguridad
+        // 1. Validar datos
         $this->validateInput($data);
 
-        // 2. Procesamiento de imágenes
+        // 2. Procesar imágenes
         if (isset($data['mainImage'])) {
             $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
         }
@@ -89,7 +115,7 @@ class ProductController
             $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
         }
 
-        // 3. Guardado
+        // 3. Guardar
         if ($this->productModel->create($data)) {
             ApiResponse::send(["message" => "Producto creado exitosamente"], 201);
         } else {
@@ -99,7 +125,7 @@ class ProductController
 
     private function updateProduct($data)
     {
-        // 1. Validación de seguridad
+        // 1. Validar datos
         $this->validateInput($data);
 
         $currentProduct = $this->getProductById($data['id']);
@@ -107,7 +133,7 @@ class ProductController
             ApiResponse::error("Producto no encontrado para actualizar", 404);
         }
 
-        // 2. Procesamiento de imágenes (Borrar viejas si cambian)
+        // 2. Procesar imágenes (borrar anteriores si cambian)
         if (isset($data['mainImage']) && strpos($data['mainImage'], 'data:image') === 0) {
             $this->imageService->deleteFile($currentProduct['main_image']);
             $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
@@ -118,7 +144,7 @@ class ProductController
             $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
         }
 
-        // 3. Actualización
+        // 3. Actualizar
         if ($this->productModel->update($data)) {
             ApiResponse::send(["message" => "Producto actualizado exitosamente"]);
         } else {
@@ -143,7 +169,6 @@ class ProductController
     }
 
     // --- Helpers Privados ---
-
     private function validateInput($data)
     {
         if (empty($data['name']) || strlen(trim($data['name'])) < 3) {
