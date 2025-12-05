@@ -21,7 +21,6 @@ class ProductController
 
     public function processRequest($id = null)
     {
-        // Instancia para validar permisos
         $auth = new AuthController($this->db, $this->requestMethod);
 
         // Endpoint público para categorías
@@ -41,13 +40,11 @@ class ProductController
                 break;
 
             case 'POST':
-                // 🔒 Solo Admin
                 $this->verifyAdmin($auth);
                 $this->createProduct($input);
                 break;
 
             case 'PUT':
-                // 🔒 Solo Admin
                 $this->verifyAdmin($auth);
                 if ($id && $input) {
                     $input['id'] = $id;
@@ -58,7 +55,6 @@ class ProductController
                 break;
 
             case 'DELETE':
-                // 🔒 Solo Admin
                 $this->verifyAdmin($auth);
                 if ($id)
                     $this->deleteProduct($id);
@@ -72,16 +68,35 @@ class ProductController
         }
     }
 
-    // --- Helper de Seguridad ---
+    // --- Helpers Privados ---
+
     private function verifyAdmin($auth)
     {
         $user = $auth->validateToken();
         if (!$user || $user->role !== 'admin') {
-            ApiResponse::error("Acceso denegado. Se requieren permisos de Administrador.", 403);
+            ApiResponse::error("Acceso denegado. Rol de Admin requerido.", 403);
         }
     }
 
-    // --- Lectura (Público) ---
+    private function validateInput($data)
+    {
+        // 🛡️ VALIDACIÓN ESTRICTA (NIVEL 10/10)
+        if (empty($data['name']) || strlen(trim($data['name'])) < 3) {
+            ApiResponse::error("El nombre es obligatorio y debe tener al menos 3 letras.", 400);
+        }
+        if (!isset($data['price']) || !is_numeric($data['price']) || $data['price'] < 0) {
+            ApiResponse::error("El precio debe ser un número positivo.", 400);
+        }
+        if (isset($data['discount']) && (!is_numeric($data['discount']) || $data['discount'] < 0 || $data['discount'] > 100)) {
+            ApiResponse::error("El descuento debe ser entre 0 y 100.", 400);
+        }
+        if (empty($data['category'])) {
+            ApiResponse::error("La categoría es obligatoria.", 400);
+        }
+    }
+
+    // --- Métodos CRUD ---
+
     private function getAllProducts()
     {
         ApiResponse::send($this->productModel->getAll());
@@ -101,13 +116,10 @@ class ProductController
             ApiResponse::error("Producto no encontrado", 404);
     }
 
-    // --- Escritura (Protegido) ---
     private function createProduct($data)
     {
-        // 1. Validar datos
         $this->validateInput($data);
 
-        // 2. Procesar imágenes
         if (isset($data['mainImage'])) {
             $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
         }
@@ -115,73 +127,49 @@ class ProductController
             $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
         }
 
-        // 3. Guardar
         if ($this->productModel->create($data)) {
-            ApiResponse::send(["message" => "Producto creado exitosamente"], 201);
+            ApiResponse::send(["message" => "Producto creado correctamente"], 201);
         } else {
-            ApiResponse::error("Error interno al crear el producto");
+            ApiResponse::error("Error al guardar en base de datos");
         }
     }
 
     private function updateProduct($data)
     {
-        // 1. Validar datos
         $this->validateInput($data);
 
-        $currentProduct = $this->getProductById($data['id']);
-        if (!$currentProduct) {
-            ApiResponse::error("Producto no encontrado para actualizar", 404);
-        }
+        $current = $this->getProductById($data['id']);
+        if (!$current)
+            ApiResponse::error("Producto no existe", 404);
 
-        // 2. Procesar imágenes (borrar anteriores si cambian)
         if (isset($data['mainImage']) && strpos($data['mainImage'], 'data:image') === 0) {
-            $this->imageService->deleteFile($currentProduct['main_image']);
+            $this->imageService->deleteFile($current['main_image']);
             $data['mainImage'] = $this->imageService->saveBase64($data['mainImage'], 'products');
         }
 
         if (isset($data['hoverImage']) && strpos($data['hoverImage'], 'data:image') === 0) {
-            $this->imageService->deleteFile($currentProduct['hover_image']);
+            $this->imageService->deleteFile($current['hover_image']);
             $data['hoverImage'] = $this->imageService->saveBase64($data['hoverImage'], 'products');
         }
 
-        // 3. Actualizar
         if ($this->productModel->update($data)) {
-            ApiResponse::send(["message" => "Producto actualizado exitosamente"]);
+            ApiResponse::send(["message" => "Producto actualizado"]);
         } else {
-            ApiResponse::error("Error al actualizar el producto");
+            ApiResponse::error("Error al actualizar");
         }
     }
 
     private function deleteProduct($id)
     {
         $product = $this->getProductById($id);
-
         if ($this->productModel->delete($id)) {
-            // Borrar archivos físicos
             if ($product) {
                 $this->imageService->deleteFile($product['main_image']);
                 $this->imageService->deleteFile($product['hover_image']);
             }
             ApiResponse::send(["message" => "Producto eliminado"]);
         } else {
-            ApiResponse::error("Error al eliminar el producto");
-        }
-    }
-
-    // --- Helpers Privados ---
-    private function validateInput($data)
-    {
-        if (empty($data['name']) || strlen(trim($data['name'])) < 3) {
-            ApiResponse::error("El nombre es obligatorio y debe tener al menos 3 caracteres.", 400);
-        }
-        if (!isset($data['price']) || !is_numeric($data['price']) || $data['price'] < 0) {
-            ApiResponse::error("El precio es obligatorio y debe ser un número positivo.", 400);
-        }
-        if (isset($data['discount']) && (!is_numeric($data['discount']) || $data['discount'] < 0 || $data['discount'] > 100)) {
-            ApiResponse::error("El descuento debe ser un porcentaje entre 0 y 100.", 400);
-        }
-        if (empty($data['category'])) {
-            ApiResponse::error("La categoría es obligatoria.", 400);
+            ApiResponse::error("Error al eliminar");
         }
     }
 
