@@ -78,11 +78,11 @@ ng serve
 Abrir el navegador en http://localhost:4200.
 
 🔐 Credenciales de Acceso
-Para probar el panel de administración, pueden usar el usuario por defecto creado tras importar la base de datos:
+Para probar el panel de administración primero deben ir a: http://localhost/Breath/backend/install_db.php, pueden usar el usuario por defecto creado tras importar la base de datos:
 
 Usuario: admin
 
-Contraseña: admin123 (Si importaron el SQL manual) o Breathe_Admin2025! (Si usaron el botón Reset DB desde el panel).
+Contraseña: Breathe_Admin2025! (Luego de loguearse apreten el reset db para que ya quede guardada la contraseña y posteriormente eliminen el archivo install_db.php)
 
 📂 Estructura del Proyecto
 El proyecto está organizado para ser escalable:

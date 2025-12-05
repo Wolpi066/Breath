@@ -1,4 +1,11 @@
-CREATE DATABASE IF NOT EXISTS `breath_shop`;
+-- --------------------------------------------------------
+-- Breath Shop - Script de Respaldo Manual
+-- --------------------------------------------------------
+-- NOTA: Se recomienda usar 'backend/install_db.php' para la instalación inicial
+-- ya que genera los hashes de contraseña correctos para tu sistema.
+-- --------------------------------------------------------
+
+CREATE DATABASE IF NOT EXISTS `breath_shop` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `breath_shop`;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -10,7 +17,7 @@ DROP TABLE IF EXISTS `products`;
 DROP TABLE IF EXISTS `sizes`;
 DROP TABLE IF EXISTS `users`;
 
--- 2. ESTRUCTURA
+-- 2. ESTRUCTURA (Tablas)
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
@@ -83,19 +90,15 @@ INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `disco
 (11, 'CAP BREATHE BLACK', 'Gorra negra con bordado "breathe"', 'gorras', 30.00, 0, 'assets/CARDS/NEWgorraNegra.png', 'assets/CARDS/NEWgorraNegra.png');
 
 INSERT INTO `product_variants` (`product_id`, `size_id`, `stock`) VALUES
-(1, 1, 7), (1, 2, 11), (1, 3, 9), (1, 4, 5),
-(2, 1, 6), (2, 2, 10), (2, 3, 8), (2, 4, 4),
-(3, 1, 6), (3, 2, 10), (3, 3, 8), (3, 4, 5),
-(4, 1, 10), (4, 2, 15), (4, 3, 12), (4, 4, 8),
-(5, 1, 6), (5, 2, 10), (5, 3, 8), (5, 4, 4),
-(6, 1, 8), (6, 2, 12), (6, 3, 10), (6, 4, 6),
-(7, 1, 12), (7, 2, 18), (7, 3, 14), (7, 4, 10),
-(8, 1, 10), (8, 2, 16), (8, 3, 12), (8, 4, 8),
-(9, 1, 14), (9, 2, 20), (9, 3, 16), (9, 4, 12),
-(10, 6, 25),
-(11, 6, 30);
+(1, 1, 7), (1, 2, 11), (1, 3, 9), (1, 4, 5), (2, 1, 6), (2, 2, 10), (2, 3, 8), (2, 4, 4),
+(3, 1, 6), (3, 2, 10), (3, 3, 8), (3, 4, 5), (4, 1, 10), (4, 2, 15), (4, 3, 12), (4, 4, 8),
+(5, 1, 6), (5, 2, 10), (5, 3, 8), (5, 4, 4), (6, 1, 8), (6, 2, 12), (6, 3, 10), (6, 4, 6),
+(7, 1, 12), (7, 2, 18), (7, 3, 14), (7, 4, 10), (8, 1, 10), (8, 2, 16), (8, 3, 12), (8, 4, 8),
+(9, 1, 14), (9, 2, 20), (9, 3, 16), (9, 4, 12), (10, 6, 25), (11, 6, 30);
 
--- USUARIO ADMIN
+-- USUARIO ADMIN POR DEFECTO PARA IMPORT MANUAL
+-- Contraseña: admin123
+-- (Si deseas usar Breathe_Admin2025!, usa install_db.php o actualiza este hash manualmente)
 INSERT INTO `users` (`username`, `email`, `password`, `role`) VALUES
 ('admin', 'admin@breathe.com', '$2y$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', 'admin');
 
