@@ -1,5 +1,4 @@
 <?php
-
 $models_path = realpath(__DIR__ . '/../models');
 require_once $models_path . '/User.php';
 
@@ -11,7 +10,6 @@ if (!$jwt_file) {
 require_once $jwt_file;
 
 use \Firebase\JWT\JWT;
-
 require_once __DIR__ . '/../helpers/ApiResponse.php';
 
 class AuthController
@@ -27,16 +25,17 @@ class AuthController
         $this->userModel = new User($db);
     }
 
-    public function processRequest()
+    // ✅ CORRECCIÓN: Recibimos $action (puede ser 'login' o 'register')
+    public function processRequest($action = null)
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
-
-        if (empty($input) && !empty($_POST)) {
+        if (empty($input) && !empty($_POST))
             $input = $_POST;
-        }
 
         if ($this->requestMethod == 'POST') {
-            if (isset($input['action']) && $input['action'] == 'register') {
+            // Priorizamos la acción de la URL (.../auth/register)
+            // Si no viene en URL, miramos el body (retrocompatibilidad)
+            if ($action === 'register' || (isset($input['action']) && $input['action'] == 'register')) {
                 $this->register($input);
             } else {
                 $this->login($input);
@@ -64,7 +63,6 @@ class AuthController
             $secret = getenv('JWT_SECRET');
             if (!$secret)
                 throw new Exception("JWT Secret no configurado");
-
             $decoded = JWT::decode($token, $secret, array('HS256'));
             return $decoded->data;
         } catch (Exception $e) {
@@ -80,7 +78,6 @@ class AuthController
 
         $this->userModel->username = $data['username'];
 
-        // Verificar existencia por username
         if (!$this->userModel->usernameExists()) {
             $this->userModel->email = $data['username'];
             if (!$this->userModel->emailExists()) {
@@ -90,12 +87,13 @@ class AuthController
 
         if (password_verify($data['password'], $this->userModel->password)) {
             $secret = getenv('JWT_SECRET');
+            $frontendUrl = getenv('FRONTEND_URL') ?: "http://localhost";
 
             $payload = array(
-                'iss' => getenv('FRONTEND_URL') ?: "http://localhost",
-                'aud' => getenv('FRONTEND_URL') ?: "http://localhost",
+                'iss' => $frontendUrl,
+                'aud' => $frontendUrl,
                 'iat' => time(),
-                'exp' => time() + (3600 * 24), // 24 horas
+                'exp' => time() + (3600 * 24),
                 'data' => array(
                     'id' => $this->userModel->id,
                     'username' => $this->userModel->username,
@@ -127,7 +125,7 @@ class AuthController
         $this->userModel->username = $data['username'];
         $this->userModel->email = $data['email'];
         $this->userModel->password = $data['password'];
-        $this->userModel->role = 'user'; // Default
+        $this->userModel->role = 'user';
 
         if ($this->userModel->create()) {
             ApiResponse::send(["message" => "Usuario registrado exitosamente"], 201);
