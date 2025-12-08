@@ -2,11 +2,13 @@
 // backend/install_db.php
 
 // 1. Cargar Configuración
-require_once 'helpers/EnvLoader.php';
+require_once('../backend/helpers/EnvLoader.php');
 
 try {
-  if (file_exists(__DIR__ . '/.env')) {
-    EnvLoader::load(__DIR__ . '/.env');
+  $envPath = __DIR__ . '/../backend/.env';
+
+  if (file_exists($envPath)) {
+    EnvLoader::load($envPath);
   } else {
     die("❌ Error: No se encuentra el archivo .env. Configúralo primero.");
   }

@@ -4,12 +4,16 @@ import { CommonModule } from '@angular/common';
 import { MinimalNavbarComponent } from './components/minimal-navbar/minimal-navbar.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { MinimalProductGridComponent } from './components/minimal-product-grid/minimal-product-grid.component';
-import { ProductsPageComponent } from './components/products-page/products-page.components';
+import { ProductsPageComponent } from './components/products-page/products-page.component';
 import { MinimalFooterComponent } from './components/minimal-footer/minimal-footer.component';
 import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
 import { ProductDetailComponent } from './components/product-detail/product-detail.component';
+
+// 👇 IMPORTAMOS LOS COMPONENTES CON LOS NOMBRES CORRECTOS
+import { SobreNosotrosComponent } from './components/sobre-nosotros/sobre-nosotros.component';
+import { ContactoComponent } from './components/contacto/contacto.component';
 
 import { Product } from './models/product.model';
 import { BannerData } from './models/banner.model';
@@ -33,7 +37,10 @@ const banner2Img = 'assets/CARDS/wmremove-transformed.png';
     ShoppingCartComponent,
     AdminDashboardComponent,
     AuthModalComponent,
-    ProductDetailComponent
+    ProductDetailComponent,
+    // 👇 AGREGADOS AL ARRAY DE IMPORTS
+    SobreNosotrosComponent,
+    ContactoComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],

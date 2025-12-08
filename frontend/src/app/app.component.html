@@ -13,6 +13,7 @@
     }
 
     <main class="bg-white">
+
         @if (currentPage() === 'home') {
         <app-hero></app-hero>
         <app-minimal-product-grid [banners]="banners()" [adminProducts]="adminProducts()"
@@ -30,16 +31,23 @@
             (saveBanners)="saveBanners($event)">
         </app-admin-dashboard>
 
+        } @else if (currentPage() === 'about') {
+        <app-sobre-nosotros></app-sobre-nosotros>
+
+        } @else if (currentPage() === 'contacto') {
+        <app-contacto></app-contacto>
+
         } @else {
         <div style="padding-top: 150px; text-align: center; height: 60vh;">
-            <h1>PÁGINA EN CONSTRUCCIÓN</h1>
-            <button (click)="navigate('home')">VOLVER</button>
+            <h1>PÁGINA NO ENCONTRADA</h1>
+            <button (click)="navigate('home')">VOLVER AL INICIO</button>
         </div>
         }
     </main>
 
     @if (!isCartOpen() && currentPage() !== 'admin') {
-    <app-minimal-footer [isAdmin]="isAdmin" (adminClick)="navigate('admin')"></app-minimal-footer>
+    <app-minimal-footer [isAdmin]="isAdmin" (adminClick)="navigate('admin')">
+    </app-minimal-footer>
     }
 
     <app-shopping-cart [isOpen]="isCartOpen()" [items]="cart()" (close)="closeCart()"
@@ -48,7 +56,8 @@
 
     @if (isAuthOpen()) {
     <app-auth-modal [currentUser]="currentUser()" (close)="closeAuth()" (login)="handleLogin($event)"
-        (register)="handleRegister($event)" (logout)="handleLogout()"></app-auth-modal>
+        (register)="handleRegister($event)" (logout)="handleLogout()">
+    </app-auth-modal>
     }
 </div>
 }

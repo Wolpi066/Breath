@@ -78,7 +78,7 @@ ng serve
 Abrir el navegador en http://localhost:4200.
 
 🔐 Credenciales de Acceso
-Para probar el panel de administración primero deben ir a: http://localhost/Breath/backend/install_db.php, pueden usar el usuario por defecto creado tras importar la base de datos:
+Para probar el panel de administración primero deben ir a: http://localhost/Breath/adicional/install_db.php, pueden usar el usuario por defecto creado tras importar la base de datos:
 
 Usuario: admin
 
