@@ -9,7 +9,7 @@ class Product
         $this->conn = $db;
     }
 
-    // --- LEER TODOS ---
+
     public function getAll()
     {
         $query = "SELECT 
@@ -55,7 +55,7 @@ class Product
         return array_values($products_map);
     }
 
-    // --- LEER UNO (DETALLE) ---
+
     public function getOne($id)
     {
         $query = "SELECT 
@@ -97,7 +97,7 @@ class Product
         return $product;
     }
 
-    // --- CREAR PRODUCTO ---
+
     public function create($data)
     {
         try {
@@ -133,7 +133,6 @@ class Product
         }
     }
 
-    // --- ACTUALIZAR PRODUCTO ---
     public function update($data)
     {
         try {
@@ -162,7 +161,7 @@ class Product
 
             $stmt->execute();
 
-            // Actualizar Talles: Borrar viejos -> Insertar nuevos
+
             $delQuery = "DELETE FROM product_variants WHERE product_id = :id";
             $delStmt = $this->conn->prepare($delQuery);
             $delStmt->bindParam(":id", $data['id']);
@@ -181,7 +180,7 @@ class Product
         }
     }
 
-    // --- ELIMINAR PRODUCTO ---
+
     public function delete($id)
     {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
@@ -190,7 +189,7 @@ class Product
         return $stmt->execute();
     }
 
-    // --- OBTENER CATEGORÍAS ÚNICAS ---
+
     public function getCategories()
     {
         $query = "SELECT DISTINCT category FROM " . $this->table_name . " ORDER BY category ASC";
@@ -199,7 +198,7 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    // --- HELPER: Insertar Talles ---
+
     private function insertSizes($product_id, $sizes)
     {
         $query = "INSERT INTO product_variants (product_id, size_id, stock) VALUES (:pid, :sid, :stock)";

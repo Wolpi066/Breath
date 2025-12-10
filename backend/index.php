@@ -1,15 +1,15 @@
 <?php
-// 1. Cargar Helpers y Entorno PRIMERO
+
 require_once 'helpers/EnvLoader.php';
 require_once 'helpers/ApiResponse.php';
 
 try {
     EnvLoader::load(__DIR__ . '/.env');
 } catch (Exception $e) {
-    // Silencioso en producción
+
 }
 
-// 2. Configurar CORS
+
 $origin = getenv('FRONTEND_URL') ?: '*';
 header("Access-Control-Allow-Origin: $origin");
 header("Content-Type: application/json; charset=UTF-8");
@@ -21,19 +21,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit;
 }
 
-// 3. Conexión a Base de Datos
+
 require_once 'config/Database.php';
 $database = new Database();
 $db = $database->getConnection();
-
-// 4. Enrutamiento
 $scriptName = dirname($_SERVER['SCRIPT_NAME']);
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = str_replace($scriptName, '', $requestUri);
 $pathParts = explode('/', trim($path, '/'));
 
 $resource = $pathParts[0] ?? null;
-$subResource = $pathParts[1] ?? null; // ID o acción (ej: 'register')
+$subResource = $pathParts[1] ?? null;
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 switch ($resource) {
@@ -46,7 +44,6 @@ switch ($resource) {
     case 'auth':
         require_once 'controllers/AuthController.php';
         $controller = new AuthController($db, $requestMethod);
-        // ✅ CORRECCIÓN: Pasamos $subResource (que contiene 'login' o 'register')
         $controller->processRequest($subResource);
         break;
 

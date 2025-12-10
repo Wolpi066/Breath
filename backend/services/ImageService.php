@@ -5,14 +5,11 @@ class ImageService
 
     public function __construct()
     {
-        // ✅ CORRECCIÓN: Solo subimos un nivel (de 'services' a 'backend')
-        // Antes era '/../../uploads/' (incorrecto, salía del backend)
         $this->targetDir = __DIR__ . '/../uploads/';
     }
 
     public function saveBase64($base64_string, $subfolder)
     {
-        // Si no es base64, devolvemos tal cual (puede ser url vieja)
         if (strpos($base64_string, 'data:image') !== 0) {
             return $base64_string;
         }
@@ -29,17 +26,17 @@ class ImageService
         $filename = uniqid() . '.' . $extension;
         $folderPath = $this->targetDir . $subfolder . '/';
 
-        // Crear carpeta si no existe
+
         if (!is_dir($folderPath)) {
             if (!mkdir($folderPath, 0777, true)) {
-                // Si falla crear carpeta, es error de permisos del servidor
+
                 throw new Exception("No se pudo crear el directorio de subida: " . $folderPath);
             }
         }
 
         file_put_contents($folderPath . $filename, $data);
 
-        // Devuelve ruta relativa para guardar en BD
+
         return 'uploads/' . $subfolder . '/' . $filename;
     }
 

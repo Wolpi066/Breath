@@ -23,7 +23,6 @@ class ProductController
     {
         $auth = new AuthController($this->db, $this->requestMethod);
 
-        // Endpoint público para categorías
         if ($this->requestMethod === 'GET' && $id === 'categories') {
             $this->getCategories();
             return;
@@ -68,7 +67,7 @@ class ProductController
         }
     }
 
-    // --- Helpers Privados ---
+
 
     private function verifyAdmin($auth)
     {
@@ -80,7 +79,7 @@ class ProductController
 
     private function validateInput($data)
     {
-        // 🛡️ VALIDACIÓN ESTRICTA (NIVEL 10/10)
+
         if (empty($data['name']) || strlen(trim($data['name'])) < 3) {
             ApiResponse::error("El nombre es obligatorio y debe tener al menos 3 letras.", 400);
         }
@@ -95,7 +94,6 @@ class ProductController
         }
     }
 
-    // --- Métodos CRUD ---
 
     private function getAllProducts()
     {

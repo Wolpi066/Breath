@@ -1,7 +1,7 @@
 <?php
 // backend/install_db.php
 
-// 1. Cargar Configuración
+//Cargar Configuración
 require_once('../backend/helpers/EnvLoader.php');
 
 try {
@@ -26,24 +26,24 @@ echo "<h1>🚀 Instalador de Breath Shop</h1>";
 echo "<pre>";
 
 try {
-  // 2. Conectar a MySQL (Sin seleccionar DB aún)
+
   echo "Conectando a MySQL... ";
   $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   echo "OK\n";
 
-  // 3. Crear Base de Datos si no existe
+
   echo "Verificando base de datos '$dbname'... ";
   $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
   echo "OK (Creada o ya existía)\n";
 
-  // 4. Seleccionar la DB
+
   $pdo->exec("USE `$dbname`");
 
-  // 5. Estructura de Tablas (SQL)
+
   echo "Creando tablas... ";
 
-  // Habilitar multi-query simulado
+
   $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
 
   $sql = <<<'SQL'
@@ -109,7 +109,7 @@ try {
           CONSTRAINT `fk_reviews_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-        -- DATOS INICIALES
+        
         INSERT INTO `sizes` (`id`, `name`) VALUES (1,'S'), (2,'M'), (3,'L'), (4,'XL'), (5,'XXL'), (6,'Única');
 
         INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `discount`, `main_image`, `hover_image`) VALUES
@@ -137,9 +137,9 @@ SQL;
   $pdo->exec($sql);
   echo "OK (Tablas y productos creados)\n";
 
-  // 6. Insertar Admin
+
   echo "Generando usuario Admin... ";
-  // Leemos la contraseña por defecto del .env o usamos la fija
+
   $adminPassRaw = getenv('DEFAULT_ADMIN_PASS') ?: 'Breathe_Admin2025!';
   $adminPassHash = password_hash($adminPassRaw, PASSWORD_DEFAULT);
 

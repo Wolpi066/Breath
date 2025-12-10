@@ -15,7 +15,7 @@ class User
         $this->conn = $db;
     }
 
-    // --- REGISTRAR NUEVO USUARIO ---
+
     public function create()
     {
         $query = "INSERT INTO " . $this->table_name . "
@@ -27,15 +27,15 @@ class User
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitizar SOLO texto normal, NO la contraseña
+
         $this->username = htmlspecialchars(strip_tags($this->username));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->role = htmlspecialchars(strip_tags($this->role));
 
-        // Hashear la contraseña CRUDA, sin modificarla antes
+
         $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
 
-        // Bindear
+
         $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':email', $this->email);
         $stmt->bindParam(':password', $password_hash);
@@ -47,7 +47,7 @@ class User
         return false;
     }
 
-    // --- BUSCAR POR EMAIL ---
+
     public function emailExists()
     {
         $query = "SELECT id, username, password, role
@@ -70,7 +70,7 @@ class User
         return false;
     }
 
-    // --- BUSCAR POR USERNAME ---
+
     public function usernameExists()
     {
         $query = "SELECT id, username, email, password, role

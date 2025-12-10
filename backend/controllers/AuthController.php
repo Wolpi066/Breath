@@ -25,7 +25,6 @@ class AuthController
         $this->userModel = new User($db);
     }
 
-    // ✅ CORRECCIÓN: Recibimos $action (puede ser 'login' o 'register')
     public function processRequest($action = null)
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -33,8 +32,7 @@ class AuthController
             $input = $_POST;
 
         if ($this->requestMethod == 'POST') {
-            // Priorizamos la acción de la URL (.../auth/register)
-            // Si no viene en URL, miramos el body (retrocompatibilidad)
+
             if ($action === 'register' || (isset($input['action']) && $input['action'] == 'register')) {
                 $this->register($input);
             } else {

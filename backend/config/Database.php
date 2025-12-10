@@ -27,7 +27,7 @@ class Database
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
         } catch (PDOException $exception) {
-            // Error genérico para no revelar detalles de infraestructura
+
             error_log("Connection error: " . $exception->getMessage());
             echo json_encode(["error" => "Error de conexión interno."]);
             exit;

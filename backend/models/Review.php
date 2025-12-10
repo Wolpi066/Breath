@@ -9,7 +9,7 @@ class Review
         $this->conn = $db;
     }
 
-    // --- CREAR RESEÑA ---
+
     public function create($userId, $productId, $rating, $comment)
     {
         $query = "INSERT INTO " . $this->table_name . " 
@@ -29,7 +29,7 @@ class Review
         return $stmt->execute();
     }
 
-    // --- OBTENER POR PRODUCTO ---
+
     public function getByProduct($productId)
     {
         $query = "SELECT r.id, r.user_id, r.rating, r.comment, r.created_at, u.username 
@@ -60,7 +60,7 @@ class Review
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // --- ELIMINAR ---
+
     public function delete($id)
     {
         $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";

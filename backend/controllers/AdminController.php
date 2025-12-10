@@ -15,7 +15,7 @@ class AdminController
 
     public function processRequest($action = null)
     {
-        // 1. Verificación de Seguridad: Solo ADMIN puede resetear
+
         $auth = new AuthController($this->db, $this->requestMethod);
         $user = $auth->validateToken();
 
@@ -23,7 +23,7 @@ class AdminController
             ApiResponse::error("Acceso denegado. Se requiere rol de Admin.", 403);
         }
 
-        // 2. Rutas del controlador
+
         if ($action === 'reset-db' && $this->requestMethod == 'POST') {
             $this->resetDatabase();
         } else {
@@ -34,10 +34,10 @@ class AdminController
     private function resetDatabase()
     {
         try {
-            // Habilitar ejecución de múltiples queries para el script masivo
+
             $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, 1);
 
-            // SQL DE ESTRUCTURA Y DATOS BASE (Optimizado con Índices)
+
             $sqlStructure = <<<'SQL'
                 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -48,7 +48,7 @@ class AdminController
                 DROP TABLE IF EXISTS `sizes`;
                 DROP TABLE IF EXISTS `users`;
 
-                -- 2. ESTRUCTURA
+                
                 CREATE TABLE `users` (
                   `id` int(11) NOT NULL AUTO_INCREMENT,
                   `username` varchar(50) NOT NULL,
@@ -104,7 +104,7 @@ class AdminController
                   CONSTRAINT `fk_reviews_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-                -- 3. DATOS DE EJEMPLO
+               
                 INSERT INTO `sizes` (`id`, `name`) VALUES (1,'S'), (2,'M'), (3,'L'), (4,'XL'), (5,'XXL'), (6,'Única');
 
                 INSERT INTO `products` (`id`, `name`, `description`, `category`, `price`, `discount`, `main_image`, `hover_image`) VALUES
@@ -137,11 +137,10 @@ class AdminController
 SQL;
             $this->db->exec($sqlStructure);
 
-            // CREAR ADMIN CON CONTRASEÑA SEGURA (Leída desde .env)
-            // Si no existe la variable en el entorno, usamos un fallback seguro
+
             $defaultPass = getenv('DEFAULT_ADMIN_PASS') ?: 'Admin_Generico_123';
 
-            // Generamos el hash dinámicamente
+
             $adminPassHash = password_hash($defaultPass, PASSWORD_DEFAULT);
 
             $sqlUser = "INSERT INTO users (username, email, password, role) VALUES (:user, :email, :pass, :role)";
@@ -153,7 +152,7 @@ SQL;
                 ':role' => 'admin'
             ]);
 
-            // Restaurar configuración y limpiar imágenes
+
             $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
             $this->cleanUploadsFolder();
 

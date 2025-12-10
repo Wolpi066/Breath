@@ -1,4 +1,3 @@
-/* --- LAYOUT DE PÁGINA COMPLETA --- */
 .admin-page {
     width: 100%;
     min-height: 100vh;
@@ -22,7 +21,7 @@
     flex-direction: column;
 }
 
-/* --- HEADER --- */
+
 .admin-header {
     display: flex;
     justify-content: space-between;
@@ -114,7 +113,7 @@
     border-bottom: 2px solid black;
 }
 
-/* --- LAYOUT PRODUCTOS --- */
+
 .products-layout {
     display: grid;
     grid-template-columns: 360px 1fr;
@@ -129,7 +128,7 @@
     }
 }
 
-/* --- FORMULARIO --- */
+
 .form-section {
     background-color: white;
     position: sticky;
@@ -194,7 +193,7 @@
     gap: 16px;
 }
 
-/* --- TALLES --- */
+
 .size-header {
     font-size: 11px;
     letter-spacing: 1px;
@@ -262,7 +261,7 @@
     color: white;
 }
 
-/* --- UPLOAD IMAGEN --- */
+
 .image-upload-wrapper {
     border: 1px dashed #ccc;
     background-color: #fafafa;
@@ -329,7 +328,6 @@
     color: white;
 }
 
-/* --- BOTONES FORM --- */
 .form-actions {
     display: flex;
     gap: 12px;
@@ -378,7 +376,7 @@
     color: #888;
 }
 
-/* --- LISTA DE PRODUCTOS --- */
+
 .list-section {
     padding-top: 0;
 }
@@ -495,7 +493,6 @@
     border-color: #dc2626;
 }
 
-/* --- BANNERS --- */
 .banner-section {
     padding: 60px;
     max-width: 800px;
