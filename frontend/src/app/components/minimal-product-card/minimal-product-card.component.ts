@@ -39,13 +39,11 @@ export class MinimalProductCardComponent implements OnChanges {
         }
     }
 
-    // Click en el botón "COMPRAR"
     onAddToCartClick(event: Event): void {
         event.stopPropagation();
         this.addToCart.emit(this.id);
     }
 
-    // Click en la imagen/tarjeta (para ver detalle)
     onCardClick(): void {
         this.cardClick.emit(this.id);
     }

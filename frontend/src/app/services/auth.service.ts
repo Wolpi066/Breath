@@ -21,8 +21,6 @@ export class AuthService {
         });
     }
 
-    // --- ACCIONES ---
-
     login(username: string, pass: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { username, password: pass }).pipe(
             tap(response => {

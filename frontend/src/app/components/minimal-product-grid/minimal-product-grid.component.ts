@@ -18,8 +18,6 @@ export class MinimalProductGridComponent {
     @Output() addToCart = new EventEmitter<string>();
     @Output() cardClick = new EventEmitter<string>();
 
-    // --- LÓGICA DE DISTRIBUCIÓN PERSONALIZADA ---
-
     get secondRowProducts() {
         const remeras = this.adminProducts.filter(p => p.category.toLowerCase() === 'remeras');
         return remeras.slice(0, 4);

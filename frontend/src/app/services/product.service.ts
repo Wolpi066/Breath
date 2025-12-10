@@ -6,7 +6,6 @@ import { Product } from '../models/product.model';
 import { AuthService } from './auth.service';
 import { BannerData } from '../models/banner.model';
 
-// ✅ Interfaz para respuestas estándar del backend
 export interface ApiResponse {
     message?: string;
     error?: string;
@@ -55,7 +54,6 @@ export class ProductService {
         return this.http.get<string[]>(`${this.apiUrl}/categories`);
     }
 
-    // ✅ Tipado estricto en lugar de 'any'
     createProduct(product: Product): Observable<ApiResponse> {
         return this.http.post<ApiResponse>(this.apiUrl, product, { headers: this.authService.authHeaders });
     }

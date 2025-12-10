@@ -40,7 +40,6 @@ export class ContactoComponent {
 
     this.isSubmitting.set(false);
 
-    // Opcional: limpiar el formulario o dejarlo como está
     // this.formData = { name: '', subject: '', message: '' };
   }
 }

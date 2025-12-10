@@ -15,12 +15,10 @@ export class CartService {
     open(): void { this.isOpen = true; }
     close(): void { this.isOpen = false; }
 
-    // Busca un item específico por ID y Talle
     private findItem(id: string, size: string) {
         return this.items.find(i => i.id === id && i.size === size);
     }
 
-    // Obtiene cuántos hay en el carrito de un producto/talle específico
     getQuantityInCart(id: string, size: string): number {
         const item = this.findItem(id, size);
         return item ? item.quantity : 0;
@@ -30,7 +28,6 @@ export class CartService {
         const quantityToAdd = item.quantity ?? 1;
         const existingItem = this.findItem(item.id, item.size);
 
-        // Verificar stock total
         const currentQty = existingItem ? existingItem.quantity : 0;
 
         if (currentQty + quantityToAdd > item.stock) {
@@ -58,7 +55,6 @@ export class CartService {
             return;
         }
 
-        // Validación estricta de stock
         if (quantity > item.stock) {
             alert(`Lo sentimos, solo hay ${item.stock} unidades disponibles en este talle.`);
             item.quantity = item.stock;

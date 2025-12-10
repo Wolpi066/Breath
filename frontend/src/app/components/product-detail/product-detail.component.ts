@@ -46,7 +46,6 @@ export class ProductDetailComponent implements OnChanges {
         }
     }
 
-    // Lógica inteligente de stock
     get effectiveStock(): number {
         const size = this.selectedSize();
         if (!size) return 0;
@@ -57,12 +56,10 @@ export class ProductDetailComponent implements OnChanges {
         return Math.max(0, totalStock - inCart);
     }
 
-    // Validar incremento
     incrementQty() {
         if (this.quantity() < this.effectiveStock) {
             this.quantity.update(q => q + 1);
         } else {
-            // Posible implementacion sonora de tope alcanzado
         }
     }
 
@@ -78,7 +75,6 @@ export class ProductDetailComponent implements OnChanges {
 
         const stockTotal = this.product.sizes.find(s => s.size === size)?.stock || 0;
 
-        // Validación final antes de emitir
         if (this.quantity() > this.effectiveStock) {
             alert('No hay suficiente stock disponible para agregar esa cantidad.');
             return;
@@ -97,7 +93,6 @@ export class ProductDetailComponent implements OnChanges {
 
     onLoginClick() { this.openAuth.emit(); }
 
-    // --- LÓGICA DE RESEÑAS ---
     loadReviews() {
         this.reviewService.getReviews(this.product.id).subscribe({
             next: (data) => this.reviews.set(data),

@@ -17,7 +17,6 @@ export class MinimalNavbarComponent {
     @Output() authClick = new EventEmitter<void>();
     @Output() navigate = new EventEmitter<'home' | 'productos' | 'contacto' | 'about'>();
 
-    // Evento para emitir la búsqueda al padre
     @Output() search = new EventEmitter<string>();
 
     isMenuOpen = false;
@@ -52,7 +51,6 @@ export class MinimalNavbarComponent {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Método para emitir
     onSearch(term: string) {
         this.search.emit(term);
     }
